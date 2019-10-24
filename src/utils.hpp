@@ -38,7 +38,7 @@ std::string::iterator find_tab_in_string(std::string::iterator it)
     return it;
 }
 
-int choose(const int n, const int k);
+unsigned long choose(const int n, const int k);
 
 }
 

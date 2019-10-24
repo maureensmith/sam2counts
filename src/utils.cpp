@@ -1,14 +1,14 @@
 namespace utils
 {
-int choose(const int n, const int k)
-{
-    if(k == 0)
+    unsigned long choose(const int n, const int k)
     {
-        return(1);
-    } else {
-        return((n * choose(n - 1, k - 1)) / k);
+        if(k == 0)
+        {
+            return(1);
+        } else {
+            return((n * choose(n - 1, k - 1)) / k);
+        }
     }
-}
 
 char to_upper(const char in)
 {

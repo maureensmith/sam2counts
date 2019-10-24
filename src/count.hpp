@@ -30,6 +30,8 @@ class counter_1 final
 
     void count(const ref::ref_map& read);
 
+    void count(const ref::ref_map& read, const unsigned times);
+
     void count(const std::size_t index,
                const char base)
     {
@@ -60,6 +62,15 @@ class counter_2 final
     }
 
     void count(const ref::ref_map& read);
+    void count(const ref::ref_map& read, const unsigned times);
+    void count(const std::size_t pos1, const std::size_t pos2,const char base1, const char base2, const int times)
+    {
+        const auto pos1_idx = (pos1 - 1);
+        const auto i = pos1_idx * (size-1) - utils::choose(pos1_idx, 2);
+        std::size_t pairwise_pos_index = i + pos2 - pos1_idx - 2;
+        std::size_t pairwise_nucl_index = counter_1::nucleobase_count*nucleotid::nucleobase{base1}.to_id() + nucleotid::nucleobase{base2}.to_id();
+        data[pairwise_pos_index][pairwise_nucl_index] += times;
+    }
 
     void write_to_file(const std::string& out_file);
 
@@ -82,6 +93,8 @@ class counter_3 final
     }
 
     void count(const ref::ref_map& read);
+
+    void count(const ref::ref_map& read, const unsigned times);
 
     void write_to_file(const std::string& out_file);
 

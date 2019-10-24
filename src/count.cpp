@@ -11,19 +11,22 @@
 namespace count
 {
 
-void counter_1::count(const ref::ref_map& read)
-{
-    std::for_each(read.begin(), read.end(), [this](const auto& entry)
+    void counter_1::count(const ref::ref_map& read) {
+        counter_1::count(read,1);
+    }
+    void counter_1::count(const ref::ref_map& read, const unsigned times)
     {
-        //TODO: HIER SCHAUEN WELCHE READS GEZÄHLT WERDEN
-       // if(entry.first == 17 && entry.second.get() == 'A')
-//            std::cout << "read " << i << " all from read pair1 " << entry.second.to_id() << std::endl;
-        if(entry.second.get() not_eq 'N')
+        std::for_each(read.begin(), read.end(), [this, times](const auto& entry)
         {
-            ++data[entry.first - 1][entry.second.to_id()];
-        }
-    });
-}
+            //TODO: HIER SCHAUEN WELCHE READS GEZÄHLT WERDEN
+           // if(entry.first == 17 && entry.second.get() == 'A')
+    //            std::cout << "read " << i << " all from read pair1 " << entry.second.to_id() << std::endl;
+            if(entry.second.get() not_eq 'N')
+            {
+                data[entry.first - 1][entry.second.to_id()] += times;
+            }
+        });
+    }
 
 
 void counter_1::write_to_file(const std::string& out_file)
@@ -45,8 +48,11 @@ void counter_1::write_to_file(const std::string& out_file)
     }
 }
 
+void counter_2::count(const ref::ref_map& read) {
+    counter_2::count(read,1);
+}
 
-void counter_2::count(const ref::ref_map& read)
+void counter_2::count(const ref::ref_map& read, const unsigned times)
 {
     if (read.size() < 2)
     {
@@ -79,7 +85,7 @@ void counter_2::count(const ref::ref_map& read)
                     } */
 
                     const auto j = counter_1::nucleobase_count * nucl1.to_id();
-                    ++data[i + (pos2->first - pos1_idx - 2)][j + pos2->second.to_id()];
+                    data[i + pos2->first - pos1_idx - 2][j + pos2->second.to_id()] += times;
                 }
                 ++pos2;
             }
@@ -89,6 +95,8 @@ void counter_2::count(const ref::ref_map& read)
         }
     }
 }
+
+
 
 
 void counter_2::write_to_file(const std::string& out_file)
@@ -126,7 +134,11 @@ void counter_2::write_to_file(const std::string& out_file)
 }
 
 //TODO anpassen
-void counter_3::count(const ref::ref_map& read)
+void counter_3::count(const ref::ref_map& read) {
+    counter_3::count(read,1);
+}
+
+void counter_3::count(const ref::ref_map& read, const unsigned times)
 {
     if (read.size() < 3)
     {
@@ -173,7 +185,7 @@ void counter_3::count(const ref::ref_map& read)
                             //TODO
 //                             std::cout << "pos1 " << p1 << " pos2 " << p2 << " pos3 " << pos3->first << std::endl;
 //                             std::cout << "3D seqPos " << seqpos1 + seqpos2 + pos3->first - p2 - 1 << std::endl;
-                             ++data[seqpos1 + seqpos2 + pos3->first - p2 - 1][mutPos];
+                             data[seqpos1 + seqpos2 + pos3->first - p2 - 1][mutPos] += times;
                         }
                         ++pos3;
                     }

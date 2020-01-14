@@ -1,6 +1,6 @@
 # build and hidden files and directories 
 .*
-!.gitignore
+!\.gitignore
 *build*
 
 # Prerequisites

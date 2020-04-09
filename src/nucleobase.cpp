@@ -18,7 +18,6 @@ nucleobase::nucleobase(char base)
     {
  //       throw std::invalid_argument(std::string{base} + std::string{" is not a valid base"});
     }
-    //TODO: sicherer is switchen
     //mapping of the nucleotide bases to IDs (eg A-A/2 = 0, C-A/2 = 1 etc)
     //A=0, C=1, G=2, T=3, N=4, X=5
     switch(base)
@@ -37,7 +36,7 @@ nucleobase::nucleobase(char base)
 
 nucleobase::nucleobase(const int base_id) 
 {
-    //TODO changed to 5, because N is considered here
+    // TODO statt der 5 die länge des noch kommenden vectors -1 (# valid symbols, i.e. X invalid)
     if (std::max(std::min(5, base_id), 1) != base_id)
     {
         throw std::invalid_argument(std::to_string(base) + std::string{" is not a valid base id"});

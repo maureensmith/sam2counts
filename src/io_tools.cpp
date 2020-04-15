@@ -37,7 +37,7 @@ namespace io_tools {
 
                 std::for_each(line.cbegin(), line.cend(), [&ref](char c) {
                     c = static_cast<char> (std::toupper(c));
-                    ref.add(nucleotid::nucleobase{c});
+                    ref.add(nucleotide::nucleobase{c});
                 });
             }
         } else {
@@ -49,7 +49,7 @@ namespace io_tools {
                     std::string base;
                     std::getline(ss, pos, ',');
                     std::getline(ss, base);
-                    ref.add_at(stoi(pos), nucleotid::nucleobase{std::stoi(base)});
+                    ref.add_at(stoi(pos), nucleotide::nucleobase{std::stoi(base)});
                 }
                 std::getline(infile, line);
             }

@@ -35,7 +35,7 @@ class counter_1 final
     void count(const std::size_t index,
                const char base)
     {
-        ++data[index][nucleotid::nucleobase{base}.to_id()];
+        ++data[index][nucleotide::nucleobase{base}.to_id()];
     }
 
     void write_to_file(const std::string& out_file);
@@ -68,7 +68,7 @@ class counter_2 final
         const auto pos1_idx = (pos1 - 1);
         const auto i = pos1_idx * (size-1) - utils::choose(pos1_idx, 2);
         std::size_t pairwise_pos_index = i + pos2 - pos1_idx - 2;
-        std::size_t pairwise_nucl_index = counter_1::nucleobase_count*nucleotid::nucleobase{base1}.to_id() + nucleotid::nucleobase{base2}.to_id();
+        std::size_t pairwise_nucl_index = counter_1::nucleobase_count * nucleotide::nucleobase{base1}.to_id() + nucleotide::nucleobase{base2}.to_id();
         data[pairwise_pos_index][pairwise_nucl_index] += times;
     }
 

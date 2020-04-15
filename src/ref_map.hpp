@@ -13,7 +13,7 @@ namespace ref
 class ref_map final
 {
   public:
-    using data_type = std::pair<unsigned, nucleotid::nucleobase>;
+    using pos_nucl = std::pair<unsigned, nucleotide::nucleobase>;
     using size_type = std::size_t;
 
     ref_map() = default;
@@ -43,7 +43,7 @@ class ref_map final
         return fake_end;
     }
 
-    void remove(data_type* pos)
+    void remove(pos_nucl* pos)
     {
         --fake_end;
         *pos = *fake_end;
@@ -56,9 +56,9 @@ class ref_map final
             capacity = size + 1;
             auto tmp = data;
             const auto ns = this->size();
-            data = new data_type[capacity];
+            data = new pos_nucl[capacity];
             //TODO: work around: seit gcc8 compile fehler
-            std::memcpy(reinterpret_cast<char*> (data), reinterpret_cast<char*> (tmp), sizeof (data_type) * ns);
+            std::memcpy(reinterpret_cast<char*> (data), reinterpret_cast<char*> (tmp), sizeof (pos_nucl) * ns);
             fake_end = data + ns;
             delete[] tmp;
         }
@@ -69,7 +69,7 @@ class ref_map final
         fake_end = data;
     }
 
-    void add(std::pair<unsigned, nucleotid::nucleobase>&& pair)
+    void add(std::pair<unsigned, nucleotide::nucleobase>&& pair)
     //void add(const unsigned p, const char n)
     {
         *fake_end = pair;
@@ -84,8 +84,8 @@ class ref_map final
 
   private:
     size_type capacity{0};
-    data_type* data{nullptr};
-    data_type* fake_end{nullptr};
+    pos_nucl* data{nullptr};
+    pos_nucl* fake_end{nullptr};
 };
 }
 

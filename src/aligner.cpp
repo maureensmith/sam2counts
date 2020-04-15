@@ -110,7 +110,7 @@ void aligner::align()
                 // und wenn N und irgendeine Mutation vorhanden ist, soll sie ja sowie rausgeschmissen werden
 //                if (base not_eq 'N')
 //                {
-                    read.add({posinref_a, nucleotid::nucleobase{base}});
+                    read.add({posinref_a, nucleotide::nucleobase{base}});
 //                }
                 ++posinref_a;
                 ++read_seq_a;
@@ -283,7 +283,7 @@ void aligner::align_2()
                         //(is not stored in the read for later counting)
                         if(base not_eq 'N')
                         {
-                            read.add({posinref_b, nucleotid::nucleobase{base}});
+                            read.add({posinref_b, nucleotide::nucleobase{base}});
                         }
                     }
                     else

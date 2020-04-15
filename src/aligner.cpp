@@ -28,7 +28,6 @@ namespace aligner
 bool aligner::prepare(std::string& line_a,
                       std::string& line_b)
 {
-    //TODO: eingefügt, da laut SAM documentation:
     //SAM doc: "Bit 0x4 (of the FLAG) is the only reliable place to tell whether the read is unmapped.
     //If 0x4 is set, no assumptions can be made about the rest.."
     auto it = utils::find_tab_in_string<1>(line_a.begin());
@@ -102,7 +101,6 @@ void aligner::align()
             aligning_started = true;
             for (unsigned i = 0; i < num; ++i)
             {
-                 //TODO: erstmal wie ein N behandeln (also quasi ignorieren, bis genauer besprochen wie damit umgegangen werden soll
                 const int quali = get_quality(*quality_seq_a);
                 const char base = quali < quality_treshold ? 'N' : to_upper(*read_seq_a);
 
@@ -158,7 +156,6 @@ void aligner::align_1(count::counter_1& count_obj)
             aligning_started = true;
             for (unsigned i = 0; i < num; ++i)
             {
-                //TODO: siehe oben
                 const int quali = get_quality(*quality_seq_b);
                 const char base = quali < quality_treshold ? 'N' : to_upper(*read_seq_b);
 
@@ -188,7 +185,6 @@ void aligner::align_1(count::counter_1& count_obj)
                     {
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
-                         //TODO: angepasst: wenn read2 ein N hat ignorieren, bzw read1 an der position löschen wenn sie überlappen!!
                         if(base not_eq 'N')
                         {
                             count_obj.count(posinref_b - 1,
@@ -199,13 +195,11 @@ void aligner::align_1(count::counter_1& count_obj)
                     {
                         //overlapping: if the bases are equal-> ignore (will be counted later,
                         //as already stored in the read)
-                        //TODO: die Frage nach dem N später wieder mit rein nehmen
                         if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
                         {
                             //if not equal-> check if one fo the bases is equal to ref and count ref
                             // if different mutations: ignore
                             // if both have N, remove
-                            //TODO: MAL AUSBLENDEN UM DAS SELBE ZU MACHEN WIE RED
                             const auto ref_base = ref.get(posinref_b - 1).get();
                             if (ref_base == base or ref_base == pos->second.get())
                             {
@@ -287,7 +281,6 @@ void aligner::align_2()
                     {
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
-                         //TODO: angepasst: wenn read2 ein N hat ignorieren, bzw read1 an der position löschen wenn sie überlappen!!
                         if(base not_eq 'N')
                         {
                             read.add({posinref_b, nucleotid::nucleobase{base}});
@@ -301,7 +294,6 @@ void aligner::align_2()
                         {
                             //if not equal-> check if one of the bases is equal to ref and count ref
                             // if different mutations: ignore
-                            //TODO: MAL AUSBLENDEN UM DAS SELBE ZU MACHEN WIE RED: rauschmeißen wenn sie nicht gleich sind, egal was
                             const auto ref_base = ref.get(posinref_b - 1).get();
                             if (ref_base == base or ref_base == pos->second.get())
                             {

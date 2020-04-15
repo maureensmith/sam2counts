@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.0)
-
 project(sam2Counts)
 # Project name and a few useful settings. Other commands can pick up the results
 project(sam2Counts
@@ -9,6 +8,7 @@ project(sam2Counts
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 # TODO was kann man denn sonst aufrufen?
+# TODO was macht strequal?
 #if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     set(CMAKE_CXX_STANDARD 17)

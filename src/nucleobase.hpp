@@ -11,10 +11,7 @@ namespace nucleotid
 class nucleobase final
 {
   private:
-    //TODO statt array = vector
     static const std::array<char, 6> bases;
-    // id (index) of the current base in array (initial 5 = X = invalid)
-    //TODO change to base_id
     uint8_t base{5};
     //uint8_t bla[11] = {0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 3};
 

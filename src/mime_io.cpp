@@ -54,7 +54,7 @@ void workflow_1(const ref::reference& reference,
             align_a += diff.count();
 
             now = std::chrono::high_resolution_clock::now();
-            //TODO TEST TEST TEST ob da das selbe rauskommt wie bei align1
+
             aligner.align_1(counter);
             //aligner.align_2();
             //utils::align_to_reference_2(sep_b.read_seq_it, sep_b.pos_in_ref, sep_b.cigar_it, sep_b.cigar_end, read, reference);

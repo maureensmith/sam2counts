@@ -7,7 +7,6 @@
 
 #include <iostream>
 
-
 namespace count
 {
 
@@ -18,9 +17,6 @@ namespace count
     {
         std::for_each(read.begin(), read.end(), [this, times](const auto& entry)
         {
-            //TODO: HIER SCHAUEN WELCHE READS GEZÄHLT WERDEN
-           // if(entry.first == 17 && entry.second.get() == 'A')
-    //            std::cout << "read " << i << " all from read pair1 " << entry.second.to_id() << std::endl;
             if(entry.second.get() not_eq 'N')
             {
                 data[entry.first - 1][entry.second.to_id()] += times;
@@ -75,15 +71,6 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
             {
                 if(pos2->second.get() not_eq 'N')
                 {
-                    //const auto id = i + (pos2->first - pos1_idx - 2);
-                    // pairwise substitution index
-                    //TODO prüfen
-                   /* if(pos1_idx+1 == 153 && pos2->first == 161)
-                    {
-                        //std::cout << " count pos1 " << pos1_idx+1 << " " <<  nucl1.get() << " pos2 "<< pos2->first << " " << pos2->second.get() << std::endl;
-//                        std::cout << "id " <<  i + (pos2->first - pos1_idx - 2) << std::endl;
-                    } */
-
                     const auto j = counter_1::nucleobase_count * nucl1.to_id();
                     data[i + pos2->first - pos1_idx - 2][j + pos2->second.to_id()] += times;
                 }
@@ -133,7 +120,7 @@ void counter_2::write_to_file(const std::string& out_file)
     }
 }
 
-//TODO anpassen
+
 void counter_3::count(const ref::ref_map& read) {
     counter_3::count(read,1);
 }
@@ -182,9 +169,6 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                             const auto mutPos = (counter_1::nucleobase_count^2) * nucl1
                                     + counter_1::nucleobase_count * nucl2
                                     + pos3->second.to_id();
-                            //TODO
-//                             std::cout << "pos1 " << p1 << " pos2 " << p2 << " pos3 " << pos3->first << std::endl;
-//                             std::cout << "3D seqPos " << seqpos1 + seqpos2 + pos3->first - p2 - 1 << std::endl;
                              data[seqpos1 + seqpos2 + pos3->first - p2 - 1][mutPos] += times;
                         }
                         ++pos3;
@@ -200,7 +184,6 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
     }
 }
 
-//TODO anpassen
 void counter_3::write_to_file(const std::string& out_file)
 {
 
@@ -214,7 +197,20 @@ void counter_3::write_to_file(const std::string& out_file)
             "\tGAA\tGAC\tGAG\tGAT\tGCA\tGCC\tGCG\tGCT\tAGA\tGGC\tGGG\tGGT\tGTA\tGTC\tGTG\tGTT"
             "\tTAA\tTAC\tTAG\tTAT\tTCA\tTCC\tTCG\tTCT\tAGA\tTGC\tTGG\tTGT\tTTA\tTTC\tTTG\tTTT\n";
 
-    std::ofstream outfile(out_file+"_"+std::to_string(i) +"_" +std::to_string(j));
+
+
+    std::string file_prefix =  out_file;
+    std::string file_extension = "";
+
+    // if no file extension is given, just append the suffix
+    // find the position where the file extension begins and split it (if not given, leave it as it is
+    auto extension_pos = out_file.find(".");
+    if(extension_pos != std::string::npos) {
+        file_extension = out_file.substr(extension_pos);
+        file_prefix = out_file.substr(0,extension_pos);
+    }
+
+    std::ofstream outfile(file_prefix + "_" + std::to_string(i) + "_" +std::to_string(j) + file_extension);
     if (outfile.good())
     {
         outfile << header;
@@ -240,12 +236,13 @@ void counter_3::write_to_file(const std::string& out_file)
                 }
                 outfile.close();
                 outfile.clear();
-                outfile.open(out_file+"_"+std::to_string(i) +"_" +std::to_string(j));
+                outfile.open(file_prefix + "_" + std::to_string(i) + "_" +std::to_string(j) + file_extension);
                 if (outfile.good())
                 {
                     outfile << header;
                 } else
                 {
+                    //TODO: erstelle output directory if not present
                     //TODO: fehlerbehandlung?
                     break;
                 }
@@ -258,6 +255,10 @@ void counter_3::write_to_file(const std::string& out_file)
                 ++k;
             }
         }
+    } else {
+        std::cerr << "Something is wrong with output file. Maybe the directory does not exist?" << std::endl;
+        //TODO: fehlerbehandlung
+        exit(1);
     }
 }
 

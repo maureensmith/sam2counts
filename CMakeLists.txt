@@ -11,7 +11,7 @@ project(sam2Counts
 # TODO was kann man denn sonst aufrufen?
 #if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 
     # Testing only available if this is the main app
     # Note this needs to be done in the main CMakeLists

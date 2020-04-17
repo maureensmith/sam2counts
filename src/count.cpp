@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
-#include <iterator>
-
 #include <iostream>
 
 namespace count
@@ -31,6 +29,7 @@ void counter_1::write_to_file(const std::string& out_file)
 
     if (outfile.good())
     {
+        //TODO iterate header through valid symbols (also for ambiguous)
         outfile << "pos1\tA\tC\tG\tT\n";
         for (unsigned i = 0; i < data.size(); ++i)
         {
@@ -134,9 +133,6 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
 
     auto pos1 = read.begin();
     const auto end1 = std::prev(read.end(),2);
-    //const auto size_x = size - 1;
-//    std::cout << "size " << size << std::endl;
-//    std::cout << "data size " << data.size() << std::endl;
     while (pos1 != end1)
     {
         //const auto pos1_idx = (pos1->first - 1);
@@ -147,7 +143,6 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
             auto nucl1 = pos1->second.to_id();
             //index start of the triplet, 1,2,3 is 1, 1,2,4 is 2, ...
             const auto seqpos1 = utils::choose(size,3) - utils::choose(size-p1+1, 3);
-//            std::cout << "pos1 " << p1 << " seqpos 1 " << seqpos1 << std::endl;
             const auto end2 = std::prev(read.end());
             auto pos2 = ++pos1;
             while (pos2 != end2)
@@ -156,10 +151,8 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                 {
                     auto p2 = pos2->first;
                     auto nucl2 = pos2->second.to_id();
-//                    std::cout << "p2 " << p2 << std::endl;
                     // indexstart of position 2
                     auto seqpos2 = (p2-p1-1)*(size-p1) - utils::choose(p2-p1,2);
-//                    std::cout << "pos2 " << p2 << " seqpos 2 " << seqpos2 << std::endl;
                     auto pos3 = ++pos2;
                     while(pos3 != read.end())
                     {

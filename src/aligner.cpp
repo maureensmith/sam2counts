@@ -25,64 +25,71 @@ int get_quality(const char symbol)
 namespace aligner
 {
 
-bool aligner::prepare(std::string& line_a,
-                      std::string& line_b)
-{
-    //SAM doc: "Bit 0x4 (of the FLAG) is the only reliable place to tell whether the read is unmapped.
-    //If 0x4 is set, no assumptions can be made about the rest.."
-    auto it = utils::find_tab_in_string<1>(line_a.begin());
-    unsigned flag = utils::string_to_unsigned(it);
-    std::bitset<3>flag_bin_a(flag);
-    //if the flag includes 4 (= third bit set), the read is unmapped
-    bool unmapped_a = flag_bin_a.test(2);
-
-    // get left most position in reference where read maps (4th entry in SAM row)
-    //auto it = find_tab_in_string<3>(line_a.begin());
-    it = utils::find_tab_in_string<2>(it);
-    posinref_a = utils::string_to_unsigned(it);
-    if (posinref_a == 0)
+    bool aligner::prepare(std::string& line_a,
+                          std::string& line_b)
     {
-        return false;
+        aligner::prepare(line_a);
+
+        auto it = utils::find_tab_in_string<1>(line_b.begin());
+        bool flag = utils::string_to_unsigned(it);
+        std::bitset<3>flag_bin_b(flag);
+        //if the flag includes 4 (= third bit set), the read is unmapped
+        bool unmapped_b = flag_bin_b.test(2);
+
+        //it = find_tab_in_string<3>(line_b.begin());
+        it = utils::find_tab_in_string<2>(it);
+        posinref_b = utils::string_to_unsigned(it);
+        if (posinref_b == 0)
+        {
+            return false;
+        }
+
+        // getcigar containing the softclipped regions, indels and aligned regions (6th entry in SAM row)
+        cigar_it_b = utils::find_tab_in_string<2>(it);
+        if (unmapped_b or *cigar_it_b == '*')
+        {
+            return false;
+        }
+
+        cigar_end_b = utils::find_tab_in_string<1>(cigar_it_b) - 1;
+        read_seq_b = utils::find_tab_in_string<4>(cigar_end_b);
+        quality_seq_b = utils::find_tab_in_string<1>(read_seq_b);
+
+        return true;
     }
 
-    // getcigar containg the sofclipped regions, indels and aligned regions (6th entry in SAM row)
-    cigar_it_a = utils::find_tab_in_string<2>(it);
-    if (unmapped_a or *cigar_it_a == '*')
+    bool aligner::prepare(std::string& line)
     {
-        return false;
+        //SAM doc: "Bit 0x4 (of the FLAG) is the only reliable place to tell whether the read is unmapped.
+        //If 0x4 is set, no assumptions can be made about the rest.."
+        auto it = utils::find_tab_in_string<1>(line.begin());
+        unsigned flag = utils::string_to_unsigned(it);
+        std::bitset<3>flag_bin(flag);
+        //if the flag includes 4 (= third bit set), the read is unmapped
+        bool unmapped = flag_bin.test(2);
+
+        // get left most position in reference where read maps (4th entry in SAM row)
+        //auto it = find_tab_in_string<3>(line_a.begin());
+        it = utils::find_tab_in_string<2>(it);
+        posinref_a = utils::string_to_unsigned(it);
+        if (posinref_a == 0)
+        {
+            return false;
+        }
+
+        // getcigar containg the sofclipped regions, indels and aligned regions (6th entry in SAM row)
+        cigar_it_a = utils::find_tab_in_string<2>(it);
+        if (unmapped or *cigar_it_a == '*')
+        {
+            return false;
+        }
+
+        cigar_end_a = utils::find_tab_in_string<1>(cigar_it_a) - 1;
+        read_seq_a = utils::find_tab_in_string<4>(cigar_end_a);
+        quality_seq_a = utils::find_tab_in_string<1>(read_seq_a);
+
+        return true;
     }
-
-    cigar_end_a = utils::find_tab_in_string<1>(cigar_it_a) - 1;
-    read_seq_a = utils::find_tab_in_string<4>(cigar_end_a);
-    quality_seq_a = utils::find_tab_in_string<1>(read_seq_a);
-
-    it = utils::find_tab_in_string<1>(line_b.begin());
-    flag = utils::string_to_unsigned(it);
-    std::bitset<3>flag_bin_b(flag);
-    //if the flag includes 4 (= third bit set), the read is unmapped
-    bool unmapped_b = flag_bin_b.test(2);
-
-    //it = find_tab_in_string<3>(line_b.begin());
-    it = utils::find_tab_in_string<2>(it);
-    posinref_b = utils::string_to_unsigned(it);
-    if (posinref_b == 0)
-    {
-        return false;
-    }
-
-    // getcigar containing the softclipped regions, indels and aligned regions (6th entry in SAM row)
-    cigar_it_b = utils::find_tab_in_string<2>(it);
-    if (unmapped_b or *cigar_it_b == '*')
-    {
-        return false;
-    }
-
-    cigar_end_b = utils::find_tab_in_string<1>(cigar_it_b) - 1;
-    read_seq_b = utils::find_tab_in_string<4>(cigar_end_b);
-    quality_seq_b = utils::find_tab_in_string<1>(read_seq_b);
-
-    return true;
-}
 
 
 void aligner::align()
@@ -102,9 +109,7 @@ void aligner::align()
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_a);
-                const char base = quali < quality_treshold ? 'N' : to_upper(*read_seq_a);
-
-                //std::cout << "Quali ASCII " << *quality_seq_a << " 2int " << quali << std::endl;
+                const char base = (*quality_seq_a != '*' &&  quali < quality_threshold) ? 'N' : to_upper(*read_seq_a);
 
                 //TODO: erstmal rausnehmen, da wir für den Vergleich mit Red auch die rausschmeißen wo bei Überlappung utnerschiede sind
                 // und wenn N und irgendeine Mutation vorhanden ist, soll sie ja sowie rausgeschmissen werden
@@ -114,7 +119,9 @@ void aligner::align()
 //                }
                 ++posinref_a;
                 ++read_seq_a;
-                ++quality_seq_a;
+                //if only "*" is given, no quality sequence is available
+                if(*quality_seq_a != '*')
+                    ++quality_seq_a;
             }
 
         }
@@ -125,12 +132,16 @@ void aligner::align()
         else if (c == 'I' )
         {
             read_seq_a += num;
-            quality_seq_a += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_a != '*')
+                quality_seq_a += num;
         } 
         else if (c == 'S') 
         {
             read_seq_a += num;
-            quality_seq_a += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_a != '*')
+                quality_seq_a += num;
             if (aligning_started)
             {
                 posinref_a += num;
@@ -157,7 +168,7 @@ void aligner::align_1(count::counter_1& count_obj)
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_b);
-                const char base = quali < quality_treshold ? 'N' : to_upper(*read_seq_b);
+                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'N' : to_upper(*read_seq_b);
 
 
                //if (base not_eq 'N')
@@ -212,7 +223,9 @@ void aligner::align_1(count::counter_1& count_obj)
                 //}
                 ++posinref_b;
                 ++read_seq_b;
-                ++quality_seq_b;
+                //if only "*" is given, no quality sequence is available
+                if(*quality_seq_b != '*')
+                    ++quality_seq_b;
             }
 
         }
@@ -223,12 +236,16 @@ void aligner::align_1(count::counter_1& count_obj)
         else if (c == 'I' )
         {
             read_seq_b += num;
-            quality_seq_b += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_b != '*')
+                quality_seq_b += num;
         } 
         else if (c == 'S') 
         {
             read_seq_b += num;
-            quality_seq_b += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_b != '*')
+                quality_seq_b += num;
             if (aligning_started)
             {
                 posinref_b += num;

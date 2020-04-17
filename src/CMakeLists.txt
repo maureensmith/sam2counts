@@ -9,10 +9,11 @@ set(HEADER_LIST
         io_tools.hpp
         count.hpp
         nucleobase.hpp
-        mime_io.hpp
+        mime_io_paired.hpp
         ref_map.hpp
         reference.hpp
-        utils.hpp)
+        utils.hpp
+        mime_io_single.hpp)
 
 set(SOURCE_LIST
         aligner.cpp
@@ -20,10 +21,11 @@ set(SOURCE_LIST
         io_tools.cpp
         count.cpp
         nucleobase.cpp
-        mime_io.cpp
+        mime_io_paired.cpp
         ref_map.cpp
         reference.cpp
-        utils.cpp)
+        utils.cpp
+        mime_io_single.cpp)
 
 # CMake instructions to make the static lib
 add_library(sam2counts STATIC ${SOURCE_LIST} ${HEADER_LIST})

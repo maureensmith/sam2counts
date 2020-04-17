@@ -16,7 +16,7 @@ namespace io_tools {
 
         std::ifstream infile(file_name);
         if (not infile.good()) {
-            throw std::runtime_error(file_name + std::string{" not found!"});
+            throw std::runtime_error("Reference file " + file_name + std::string{" not found!"});
         }
 
         const auto is_comment = [](const std::string &line) {

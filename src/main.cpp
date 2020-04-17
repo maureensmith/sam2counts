@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "mime_io.hpp"
+#include "mime_io_paired.hpp"
+#include "mime_io_single.hpp"
 #include "io_tools.hpp"
 
 void printUsage(const std::string& progName) {
@@ -94,10 +95,10 @@ int main(int argc,
     }
 
     // the mandatory arguments have to be set (samfile, outputfile, dimension)
-    // if second sam file is given (paired end reads), a reference file has to be given, too
+    // TODO DOCH NICHT: if second sam file is given (paired end reads), a reference file has to be given, too
     // dimension has to be 1, 2 or 3
-    //TODO the counting for the ambiguous samybols is only possible for 1D not. klären ob auch für 2D und 3D
-    if(argc < 7 || !sFlag || !oFlag || !dFlag || (s2Flag && ! rFlag)
+    //TODO the counting for the ambiguous symbols is only possible for 1D not. klären ob auch für 2D und 3D
+    if(argc < 7 || !sFlag || !oFlag || !dFlag ||  !rFlag
     || (dimension != 1 && dimension != 2 && dimension !=3)) {
         std::cerr << "There has been something wrong with the arguments." << std::endl;
         printUsage(argv[0]);
@@ -105,7 +106,7 @@ int main(int argc,
     }
 
     if(aFlag && dimension != 1) {
-        std::cout << "Amibiguous nucleotides are only counted for single occurrences. The dimension is set to 1." << std::endl;
+        std::cout << "Ambiguous nucleotides are only counted for single occurrences. The dimension is set to 1." << std::endl;
         dimension = 1;
     }
 
@@ -114,25 +115,34 @@ int main(int argc,
     std::cout << "Sam1: " << sam_file_A << std::endl;
     if(s2Flag)
         std::cout << "Sam2: " << sam_file_B << std::endl;
-    if(rFlag)
-        std::cout << "Reffile: " << ref_file << std::endl;
+    std::cout << "Reffile: " << ref_file << std::endl;
     std::cout << "Outfile: " << out_file << std::endl;
     std::cout << "Dimension: " << dimension << std::endl;
     if(qualityThreshold > 0)
         std::cout << "Quality threshold: " << qualityThreshold << std::endl;
     if(aFlag)
-        std::cout << "Counting also ambiguities" << std::endl;
+        std::cout << "Counting nucleotides and ambiguities" << std::endl;
 
-    // Check already in the beginning, if the directory exists and if not, if it can be created
+    // Check already in the beginning, if the directory exists and if not, create it
     io_tools::check_and_create_output_directory(out_file);
 
-    if(s2Flag && rFlag) {
-        mime_io::analyse_positions(ref_file,
-                                   sam_file_A,
-                                   sam_file_B,
-                                   out_file,
-                                   dimension,
-                                   qualityThreshold);
+    // call for paired end reads
+    if(s2Flag) {
+        mime_io_paired::analyse_positions(ref_file,
+                                                 sam_file_A,
+                                                 sam_file_B,
+                                                 out_file,
+                                                 dimension,
+                                                 qualityThreshold);
+    }
+    // call for paired end reads
+    else{
+        mime_io_single::analyse_positions(ref_file,
+                                          sam_file_A,
+                                          out_file,
+                                          dimension,
+                                          qualityThreshold,
+                                          aFlag);
     }
     return 0;
 }

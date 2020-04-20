@@ -205,6 +205,7 @@ void analyse_positions(const std::string& ref,
     std::ifstream input_a(sam_a);
     std::ifstream input_b(sam_b);
 
+    std::cout << "\nStart counting" << std::endl;
     switch (dimension)
     {
       case 1:

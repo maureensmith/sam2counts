@@ -109,11 +109,11 @@ void aligner::align()
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_a);
-                const char base = (*quality_seq_a != '*' &&  quali < quality_threshold) ? 'N' : to_upper(*read_seq_a);
+                const char base = (*quality_seq_a != '*' &&  quali < quality_threshold) ? 'X' : to_upper(*read_seq_a);
 
                 //TODO: erstmal rausnehmen, da wir für den Vergleich mit Red auch die rausschmeißen wo bei Überlappung utnerschiede sind
                 // und wenn N und irgendeine Mutation vorhanden ist, soll sie ja sowie rausgeschmissen werden
-//                if (base not_eq 'N')
+//                if (base_id not_eq 'N')
 //                {
                     read.add({posinref_a, nucleotide::nucleobase{base}});
 //                }
@@ -168,10 +168,10 @@ void aligner::align_1(count::counter_1& count_obj)
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_b);
-                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'N' : to_upper(*read_seq_b);
+                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
 
 
-               //if (base not_eq 'N')
+               //if (base_id not_eq 'N')
                //{
                     //maybe two from last_pos to end, and then from begin to las_pos
 
@@ -196,7 +196,8 @@ void aligner::align_1(count::counter_1& count_obj)
                     {
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
-                        if(base not_eq 'N')
+                        //if(base not_eq 'N')
+                        if(nucleotide::isValidNucl(base, ambig))
                         {
                             count_obj.count(posinref_b - 1,
                                             base);
@@ -206,9 +207,11 @@ void aligner::align_1(count::counter_1& count_obj)
                     {
                         //overlapping: if the bases are equal-> ignore (will be counted later,
                         //as already stored in the read)
-                        if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
+                        //if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
+                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig)
+                        or !nucleotide::isValidNucl(pos->second.get(), ambig))
                         {
-                            //if not equal-> check if one fo the bases is equal to ref and count ref
+                            //if not equal-> check if one of the bases is equal to ref and count ref
                             // if different mutations: ignore
                             // if both have N, remove
                             const auto ref_base = ref.get(posinref_b - 1).get();
@@ -274,12 +277,12 @@ void aligner::align_2()
             for (unsigned i = 0; i < num; ++i)
             {
                 const char base = to_upper(*read_seq_b);
-//                if (base not_eq 'N')
+//                if (base_id not_eq 'N')
 //                {
                     //maybe two from last_pos to end, and then from begin to las_pos
 
                     // check if the paired reads overlap...
-                    // ...for the the case the second read is behind the first one
+                    // ...for the case the second read is behind the first one
                     pos = std::find_if(pos, read.end(), [this](const auto& val)
                                        {
                                        return val.first == this->posinref_b;
@@ -298,7 +301,8 @@ void aligner::align_2()
                     {
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
-                        if(base not_eq 'N')
+                        //if(base not_eq 'N')
+                        if(nucleotide::isValidNucl(base, ambig))
                         {
                             read.add({posinref_b, nucleotide::nucleobase{base}});
                         }
@@ -307,7 +311,9 @@ void aligner::align_2()
                     {
                         //overlapping: if the bases are equal-> ignore (will be counted later,
                         //as already stored in the read)
-                        if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
+                        //if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
+                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig)
+                               or !nucleotide::isValidNucl(pos->second.get(), ambig))
                         {
                             //if not equal-> check if one of the bases is equal to ref and count ref
                             // if different mutations: ignore

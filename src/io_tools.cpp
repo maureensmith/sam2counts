@@ -13,6 +13,7 @@ namespace fs = std::filesystem;
 namespace io_tools {
 
     ref::reference read_reference(const std::string &file_name) {
+        std::cout << "\nReading reference file " << file_name << std::endl;
 
         std::ifstream infile(file_name);
         if (not infile.good()) {

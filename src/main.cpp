@@ -95,7 +95,6 @@ int main(int argc,
     }
 
     // the mandatory arguments have to be set (samfile, outputfile, dimension)
-    // TODO DOCH NICHT: if second sam file is given (paired end reads), a reference file has to be given, too
     // dimension has to be 1, 2 or 3
     //TODO the counting for the ambiguous symbols is only possible for 1D not. klären ob auch für 2D und 3D
     if(argc < 7 || !sFlag || !oFlag || !dFlag ||  !rFlag

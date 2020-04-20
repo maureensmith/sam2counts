@@ -21,6 +21,13 @@ class aligner final
     {
     }
 
+    aligner(const ref::reference& ref,
+            ref::ref_map& read,
+            const int qualityThreshold, const bool a) noexcept
+            : ref{ref}, read{read}, quality_threshold{qualityThreshold}, ambig{a}
+    {
+    }
+
     // aligns the first of the paired end read
     void align();
 
@@ -53,6 +60,8 @@ class aligner final
     bool aligning_started{false};
 
     const int quality_threshold{0};
+
+    const bool ambig{false};
 };
 }
 

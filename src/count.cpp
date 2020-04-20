@@ -15,7 +15,8 @@ namespace count
     {
         std::for_each(read.begin(), read.end(), [this, times](const auto& entry)
         {
-            if(entry.second.get() not_eq 'N')
+            //if(entry.second.get() not_eq 'N')
+            if(nucleotide::isValidNucl(entry.second.get(), this->ambig))
             {
                 data[entry.first - 1][entry.second.to_id()] += times;
             }
@@ -25,12 +26,17 @@ namespace count
 
 void counter_1::write_to_file(const std::string& out_file)
 {
+    std::cout << "\nWriting counts to " << out_file << std::endl;
     std::ofstream outfile(out_file);
 
     if (outfile.good())
     {
-        //TODO iterate header through valid symbols (also for ambiguous)
-        outfile << "pos1\tA\tC\tG\tT\n";
+        //iterate header through valid symbols (also for ambiguous)
+        outfile << "pos1";
+        for(int i = 0; i<nucleotide::numberOfValidSymbols(ambig); ++i) {
+            outfile << "\t" << nucleotide::nucleobase{i}.get();
+        }
+        outfile << "\n";
         for (unsigned i = 0; i < data.size(); ++i)
         {
             outfile << (i + 1);
@@ -70,7 +76,7 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
             {
                 if(pos2->second.get() not_eq 'N')
                 {
-                    const auto j = counter_1::nucleobase_count * nucl1.to_id();
+                    const auto j = nucleobase_count * nucl1.to_id();
                     data[i + pos2->first - pos1_idx - 2][j + pos2->second.to_id()] += times;
                 }
                 ++pos2;
@@ -88,10 +94,18 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
 void counter_2::write_to_file(const std::string& out_file)
 {
     std::ofstream outfile(out_file);
-
+    std::cout << "\nWriting counts to " << out_file << std::endl;
     if (outfile.good())
     {
-        outfile << "pos1\tpos2\tAA\tAC\tAG\tAT\tCA\tCC\tCG\tCT\tGA\tGC\tGG\tGT\tTA\tTC\tTG\tTT\n";
+        //iterate header through valid symbols (also for ambiguous)
+        outfile << "pos1\tpos2";
+        for(int i = 0; i<nucleotide::numberOfValidSymbols(false); ++i) {
+            for(int j = 0; j<nucleotide::numberOfValidSymbols(false); ++j) {
+                outfile << "\t" << nucleotide::nucleobase{i}.get() << nucleotide::nucleobase{j}.get();
+            }
+        }
+        outfile << "\n";
+        //outfile << "pos1\tpos2\tAA\tAC\tAG\tAT\tCA\tCC\tCG\tCT\tGA\tGC\tGG\tGT\tTA\tTC\tTG\tTT\n";
 
         unsigned line = 0;
         unsigned i = 1;
@@ -159,8 +173,8 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                         if(pos3->second.get() not_eq 'N')
                         {
                             // pairwise substitution index
-                            const auto mutPos = (counter_1::nucleobase_count^2) * nucl1
-                                    + counter_1::nucleobase_count * nucl2
+                            const auto mutPos = (nucleobase_count^2) * nucl1
+                                    + nucleobase_count * nucl2
                                     + pos3->second.to_id();
                              data[seqpos1 + seqpos2 + pos3->first - p2 - 1][mutPos] += times;
                         }
@@ -184,7 +198,7 @@ void counter_3::write_to_file(const std::string& out_file)
     unsigned i = 1;
     unsigned j = 2;
     unsigned k = 3;
-
+    std::cout << "\nWriting counts to " << out_file << std::endl;
     const std::string header = "pos1\tpos2\tpos3\tAAA\tAAC\tAAG\tAAT\tACA\tACC\tACG\tACT\tAGA\tAGC\tAGG\tAGT\tATA\tATC\tATG\tATT"
            "\tCAA\tCAC\tCAG\tCAT\tCCA\tCCC\tCCG\tCCT\tAGA\tCGC\tCGG\tCGT\tCTA\tCTC\tCTG\tCTT"
             "\tGAA\tGAC\tGAG\tGAT\tGCA\tGCC\tGCG\tGCT\tAGA\tGGC\tGGG\tGGT\tGTA\tGTC\tGTG\tGTT"

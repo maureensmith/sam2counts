@@ -9,18 +9,23 @@ mappings in SAM format.
 
 The program is called from the command line with
 ```
-sam2counts <reffile> <samfile1> <samfile2> <outfile> <dimension> <qualiThreshold>
+sam2countsProg -r <reffile> -s1 <samfile1> [-s2 <samfile2>] -o <outfile> -d <dimension> [-q <qualiThreshold>] [-a]
 ```
 and requires the following parameters
 
-| parameter       | type          | description  |
-| :-------------  |:-------------:| :-----|
-| reffile         | (string)      | path to reference sequence file in fasta format |
-| samfile1        | (string)      |   path to first SAM file of the mapped paired reads |
-| samfiles2       | (string)      |   path to second SAM file of the mapped paired reads |
-| outfile         | (string)      |   path to output file containing the counts in tsv format |
-| dimension       | (int)         |   either 1, 2, or 3 for the counting dimension  |
-| qualiThreshold  |  (int)        |   threshold for the quality score |
+| flag      | parameter       | type          | description  |
+| :---------| :-------------  |:-------------:| :-----|
+|-r, -ref      | reffile         | (string)      |   path to reference sequence file in fasta format |
+|-s1, -sam1    | samfile1        | (string)      |   path to (first) SAM file of the mapped reads |
+|-s2, -sam2    | samfile2        | (string)      |   (optional) path to second SAM file of the mapped paired reads |
+|-o, -out      | outfile         | (string)      |   path to output file containing the counts in tsv format |
+|-d, -dimension| dimension       | (int)         |   either 1, 2, or 3 for the counting dimension  |
+|-q, -quality  | qualiThreshold  | (int)         |   (optional) threshold for the quality score |
+|-a, -ambig    |                 |               |   (optional) flag if ambiguous symbols shall be counted|
+
+By default, only the nucleotides are counted and any ambiguity is ignored. If this flag ist set, 
+also all ambiguity symbols according to the IUPAC notation are counted. For now, this option is 
+only enabled for dimension 1 and for single read SAM files. 
 
 We added a quality threshold despite the option of quality clipping in preprocessing steps. 
 The reason is, that it is usually assumed that the quality of a
@@ -29,6 +34,7 @@ are trimmed until a good quality is reached. However, it may also happen that a 
 of quality occurs within the sequence and these nucleotides of bad quality remain in the
 read. Therefore, we check for the quality of all nucleotides, since this requires only one
 additional operation per iteration.
+If a '*' is given in the quality field in the SAM or no quality threshold is given, the bases are counted without any quality check.
 
 The program can be divided into three procedures. The read pairs are imported and prefiltered,
 the cohesive sequences of a read pair are merged to one read with certain rules,

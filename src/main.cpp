@@ -7,12 +7,11 @@
 
 void printUsage(const std::string& progName) {
     std::cout << "Usage:" << std::endl;
-    std::cout << progName << " -s1 samfile1 [-s2 samfile2 -r reffile] -o outfile -d dimension [-q qualityTrehsold] [-a]" << std::endl;
+    std::cout << progName << " -r reffile -s1 samfile1 [-s2 samfile2] -o outfile -d dimension [-q qualityTrehsold] [-a]\n" << std::endl;
     std::cout << "Parameters: " << std::endl;
+    std::cout << "-r, -ref <reffile>\t reference file in fasta format" << std::endl;
     std::cout << "-s1, -sam1 <samfile1>\t sam file to read in" << std::endl;
     std::cout << "-s2, -sam2 <samfile2>\t (optional) second sam file ro read in, if paired end reads are given" << std::endl;
-    std::cout << "-r, -ref <reffile>\t (optional) reference file in fasta format, which is mandatory if paired reads are given, "
-                 "and not used with a single sam file" << std::endl;
     std::cout << "-o, -out <outfile>\t output file where there counts is written to" << std::endl;
     std::cout << "-d, -dimension <dimension> \t 1, 2 or 3,  to count single, double or triple nucleotide occurrences" << std::endl;
     std::cout << "-q, -quality <qualityThreshold>\t (optional) filtering quality of each nucleotide to reach the given threshold" << std::endl;

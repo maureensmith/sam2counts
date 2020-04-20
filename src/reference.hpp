@@ -16,11 +16,11 @@ class reference final
     reference() = default;
     ~reference() = default;
 
-    void add(const nucleotid::nucleobase base);
+    void add(const nucleotide::nucleobase base);
     void add_at(const size_type index,
-                const nucleotid::nucleobase base);
+                const nucleotide::nucleobase base);
 
-    const nucleotid::nucleobase& get(const size_type index) const noexcept
+    const nucleotide::nucleobase& get(const size_type index) const noexcept
     {
         return data[index];
     }
@@ -31,7 +31,7 @@ class reference final
     }
 
   private:
-    std::vector<nucleotid::nucleobase> data{};
+    std::vector<nucleotide::nucleobase> data{};
 };
 }
 

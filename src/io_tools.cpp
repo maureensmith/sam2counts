@@ -6,82 +6,77 @@
 #include <stdexcept>
 #include <utility>
 #include <iterator>
-
+#include <filesystem>
 #include <iostream>
 
+namespace fs = std::filesystem;
+namespace io_tools {
 
-namespace io_tools
-{
+    ref::reference read_reference(const std::string &file_name) {
+        std::cout << "\nReading reference file " << file_name << std::endl;
 
-ref::reference read_reference(const std::string& file_name)
-{
+        std::ifstream infile(file_name);
+        if (not infile.good()) {
+            throw std::runtime_error("Reference file " + file_name + std::string{" not found!"});
+        }
 
-    std::ifstream infile(file_name);
-    if (not infile.good())
-    {
-        throw std::runtime_error(file_name + std::string{" not found!"});
+        const auto is_comment = [](const std::string &line) {
+            return line[0] == '>';
+        };
+
+        ref::reference ref;
+        std::string line;
+        std::getline(infile, line);
+        const bool is_fasta = is_comment(line);
+
+        if (is_fasta) {
+            while (not infile.eof()) {
+                std::getline(infile, line);
+                if (is_comment(line)) {
+                    continue;
+                }
+
+                std::for_each(line.cbegin(), line.cend(), [&ref](char c) {
+                    c = static_cast<char> (std::toupper(c));
+                    ref.add(nucleotide::nucleobase{c});
+                });
+            }
+        } else {
+            while (not infile.eof()) {
+                if (not line.empty()) {
+                    std::stringstream ss;
+                    ss.str(line);
+                    std::string pos;
+                    std::string base;
+                    std::getline(ss, pos, ',');
+                    std::getline(ss, base);
+                    ref.add_at(stoi(pos), nucleotide::nucleobase{std::stoi(base)});
+                }
+                std::getline(infile, line);
+            }
+        }
+
+        return ref;
     }
 
-    const auto is_comment = [](const std::string& line)
-    {
-        return line[0] == '>';
-    };
 
-    ref::reference ref;
-    std::string line;
-    std::getline(infile, line);
-    const bool is_fasta = is_comment(line);
+    std::string get_first_data_line(std::ifstream &stream) {
+        std::string line;
+        do {
+            std::getline(stream, line);
+        } while (line[0] == '@');
 
-    if (is_fasta)
-    {
-        while (not infile.eof())
-        {
-            std::getline(infile, line);
-            if (is_comment(line))
-            {
-                continue;
-            }
+        return line;
+    }
 
-            std::for_each(line.cbegin(), line.cend(), [&ref](char c)
-            {
-                c = static_cast<char> (std::toupper(c));
-                ref.add(nucleotid::nucleobase{c});
-            });
+    void check_and_create_output_directory(const std::string &output_file) {
+        fs::path file = fs::path(output_file);
+        fs::path dir = fs::absolute(file.parent_path());
+        if (!fs::exists(dir)) {
+            std::cout << "Creating output directory " << dir << std::endl;
+            fs::create_directories(dir);
         }
     }
-    else 
-    {
-        while (not infile.eof())
-        {
-            if (not line.empty())
-            {
-                std::stringstream ss;
-                ss.str(line);
-                std::string pos;
-                std::string base;
-                std::getline(ss, pos, ',');
-                std::getline(ss, base);
-                ref.add_at(stoi(pos), nucleotid::nucleobase{std::stoi(base)});
-            }
-            std::getline(infile, line);
-        }
-    }
-
-    return ref;
-}
-
-
-std::string get_first_data_line(std::ifstream& stream)
-{
-    std::string line;
-    do
-    {
-        std::getline(stream, line);
-    }
-    while (line[0] == '@');
-
-    return line;
-}
 
 }
 

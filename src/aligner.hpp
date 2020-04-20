@@ -16,8 +16,15 @@ class aligner final
 
     aligner(const ref::reference& ref,
             ref::ref_map& read,
-            const int qualityTrehsold) noexcept
-        : ref{ref}, read{read}, quality_treshold{qualityTrehsold}
+            const int qualityThreshold) noexcept
+        : ref{ref}, read{read}, quality_threshold{qualityThreshold}
+    {
+    }
+
+    aligner(const ref::reference& ref,
+            ref::ref_map& read,
+            const int qualityThreshold, const bool a) noexcept
+            : ref{ref}, read{read}, quality_threshold{qualityThreshold}, ambig{a}
     {
     }
 
@@ -30,8 +37,12 @@ class aligner final
     // aligns the second paired read and counts the nucleotides per position pair
     void align_2();
 
+    //for the case of paired read SAM files
     bool prepare(std::string& line_a,
                  std::string& line_b);
+
+    //for the case of a single SAM file
+    bool prepare(std::string& line);
 
   private:
     const ref::reference& ref;
@@ -48,7 +59,9 @@ class aligner final
     std::string::iterator quality_seq_b{};
     bool aligning_started{false};
 
-    const int quality_treshold{30};
+    const int quality_threshold{0};
+
+    const bool ambig{false};
 };
 }
 

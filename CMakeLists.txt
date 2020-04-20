@@ -2,16 +2,24 @@ cmake_minimum_required(VERSION 3.0)
 project(sam2Counts)
 # Project name and a few useful settings. Other commands can pick up the results
 project(sam2Counts
+<<<<<<< HEAD
         VERSION 1.0
+=======
+        VERSION 2.0
+>>>>>>> develop
         DESCRIPTION "Use SAM files to generate nucleotide counts for each position"
         LANGUAGES CXX)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
-# TODO was kann man denn sonst aufrufen?
-# TODO was macht strequal?
+
 #if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
+
+
+
+    #SET(CMAKE_BUILD_TYPE Debug)
+
 
     # Testing only available if this is the main app
     # Note this needs to be done in the main CMakeLists
@@ -32,6 +40,15 @@ project(sam2Counts
 
 # The compiled library code is here
 add_subdirectory(src)
+
+add_executable(sam2countsProg
+        src/main.cpp
+        # Was made to test if mapping paired end reads in one SAM file gives the same result
+        #mime_io_oneSAM.cpp
+        #mime_io_oneSAM.hpp
+        )
+
+target_link_libraries(sam2countsProg sam2counts)
 
 # The executable code is here
 #add_subdirectory(apps)

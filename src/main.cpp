@@ -9,16 +9,16 @@ void printUsage(const std::string& progName) {
     std::cout << "Usage:" << std::endl;
     std::cout << progName << " -s1 samfile1 [-s2 samfile2 -r reffile] -o outfile -d dimension [-q qualityTrehsold] [-a]" << std::endl;
     std::cout << "Parameters: " << std::endl;
-    std::cout << "-s1, -sam1 <samfile1>\t\t\t sam file to read in" << std::endl;
-    std::cout << "-s2, -sam2 <samfile2>\t\t\t (optional) second sam file ro read in, if paired end reads are given" << std::endl;
-    std::cout << "-r, -ref <reffile>\t\t\t\t (optional) reference file in fasta format, which is mandatory if paired reads are given, "
+    std::cout << "-s1, -sam1 <samfile1>\t sam file to read in" << std::endl;
+    std::cout << "-s2, -sam2 <samfile2>\t (optional) second sam file ro read in, if paired end reads are given" << std::endl;
+    std::cout << "-r, -ref <reffile>\t (optional) reference file in fasta format, which is mandatory if paired reads are given, "
                  "and not used with a single sam file" << std::endl;
-    std::cout << "-o, -out <outfile>\t\t\t\t output file where there counts is written to" << std::endl;
-    std::cout << "-d, -dimension <dimension> \t\t 1, 2 or 3,  to count single, double or triple nucleotide occurrences" << std::endl;
+    std::cout << "-o, -out <outfile>\t output file where there counts is written to" << std::endl;
+    std::cout << "-d, -dimension <dimension> \t 1, 2 or 3,  to count single, double or triple nucleotide occurrences" << std::endl;
     std::cout << "-q, -quality <qualityThreshold>\t (optional) filtering quality of each nucleotide to reach the given threshold" << std::endl;
-    std::cout << "-a, -ambig \t\t\t\t\t\t (optional) by default only the nucleotides are counted and any ambiguity is ignored. "
+    std::cout << "-a, -ambig \t (optional) by default only the nucleotides are counted and any ambiguity is ignored. "
                  "If this flag ist set, also all ambiguity symbols according to the IUPAC notation are counted."
-                 "For now, this option is only enabled for dimension 1." << std::endl;
+                 "For now, this option is only enabled for dimension 1 and for single read SAM." << std::endl;
 }
 
 int main(int argc,

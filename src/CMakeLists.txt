@@ -37,14 +37,7 @@ add_library(sam2counts STATIC ${SOURCE_LIST} ${HEADER_LIST})
 # IDEs should put the headers in a nice place
 #source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
 
-add_executable(sam2countsProg
-        main.cpp
-        # Was made to test if mapping paired end reads in one SAM file gives the same result
-        #mime_io_oneSAM.cpp
-        #mime_io_oneSAM.hpp
-       )
 
-target_link_libraries(sam2countsProg sam2counts)
 
 #TODO wenn eine Lib erstellt wird: private -> gilt nur für lib, public -> muss auch für linkendes programm gelten
 #target_compile_features(sam2counts PRIVATE cxx_std_17)

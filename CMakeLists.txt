@@ -2,11 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(sam2Counts)
 # Project name and a few useful settings. Other commands can pick up the results
 project(sam2Counts
-<<<<<<< HEAD
-        VERSION 1.0
-=======
         VERSION 2.0
->>>>>>> develop
         DESCRIPTION "Use SAM files to generate nucleotide counts for each position"
         LANGUAGES CXX)
 

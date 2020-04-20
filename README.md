@@ -2,8 +2,7 @@
 
 The initial purpose of sam2counts was to generate count files from resulting MIME sequencing data which are used as input for
 the [MIMEAnTo](https://github.com/maureensmith/MIMEAnTo) tool. 
-It can be used in general to count nucleotides occurrences for each position (-pair or -triplet) with paired-end read
-mappings in SAM format. 
+It can be used in general to count nucleotides occurrences for each position (-pair or -triplet) with paired-end read or single read mappings in SAM format. 
 
 
 

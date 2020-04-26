@@ -30,7 +30,12 @@ int main(int argc,
     int dimension; // = std::stoi(argv[5]);
     int qualityThreshold = 0; //std::stoi(argv[6]);
 
-    bool oFlag, sFlag, s2Flag, rFlag, dFlag, aFlag = false;
+    bool oFlag = false;
+    bool sFlag = false;
+    bool s2Flag = false;
+    bool rFlag = false;
+    bool dFlag = false;
+    bool aFlag = false;
 
 
     for (int i = 1; i < argc; ++i) {

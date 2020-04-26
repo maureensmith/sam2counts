@@ -70,8 +70,8 @@ namespace io_tools {
     }
 
     void check_and_create_output_directory(const std::string &output_file) {
-        fs::path file = fs::path(output_file);
-        fs::path dir = fs::absolute(file.parent_path());
+        fs::path file = fs::absolute(output_file);
+        fs::path dir = file.parent_path();
         if (!fs::exists(dir)) {
             std::cout << "Creating output directory " << dir << std::endl;
             fs::create_directories(dir);

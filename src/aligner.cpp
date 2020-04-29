@@ -276,7 +276,9 @@ void aligner::align_2()
             aligning_started = true;
             for (unsigned i = 0; i < num; ++i)
             {
-                const char base = to_upper(*read_seq_b);
+
+                const int quali = get_quality(*quality_seq_b);
+                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
 //                if (base_id not_eq 'N')
 //                {
                     //maybe two from last_pos to end, and then from begin to las_pos
@@ -332,6 +334,9 @@ void aligner::align_2()
 //                }
                 ++posinref_b;
                 ++read_seq_b;
+                //if only "*" is given, no quality sequence is available
+                if(*quality_seq_b != '*')
+                    ++quality_seq_b;
             }
 
         }
@@ -342,10 +347,16 @@ void aligner::align_2()
         else if (c == 'I' )
         {
             read_seq_b += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_b != '*')
+                ++quality_seq_b;
         } 
         else if (c == 'S') 
         {
             read_seq_b += num;
+            //if only "*" is given, no quality sequence is available
+            if(*quality_seq_b != '*')
+                ++quality_seq_b;
             if (aligning_started)
             {
                 posinref_b += num;

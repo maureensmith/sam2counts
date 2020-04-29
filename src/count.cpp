@@ -69,12 +69,12 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
         auto nucl1 = pos1->second;
         //pairwise position index start
         const auto i = pos1_idx * size_x - utils::choose(pos1_idx, 2);
-        if(pos1->second.get() not_eq 'N')
+        if(nucleotide::isValidNucl(pos1->second.get(), false))
         {
             auto pos2 = ++pos1;
             while (pos2 != read.end())
             {
-                if(pos2->second.get() not_eq 'N')
+                if(nucleotide::isValidNucl(pos2->second.get(), false))
                 {
                     const auto j = nucleobase_count * nucl1.to_id();
                     data[i + pos2->first - pos1_idx - 2][j + pos2->second.to_id()] += times;
@@ -151,7 +151,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
     {
         //const auto pos1_idx = (pos1->first - 1);
 
-        if(pos1->second.get() not_eq 'N')
+        if(nucleotide::isValidNucl(pos1->second.get(), false))
         {
             auto p1 = pos1->first;
             auto nucl1 = pos1->second.to_id();
@@ -161,7 +161,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
             auto pos2 = ++pos1;
             while (pos2 != end2)
             {
-                if(pos2->second.get() not_eq 'N')
+                if(nucleotide::isValidNucl(pos2->second.get(), false))
                 {
                     auto p2 = pos2->first;
                     auto nucl2 = pos2->second.to_id();
@@ -170,7 +170,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                     auto pos3 = ++pos2;
                     while(pos3 != read.end())
                     {
-                        if(pos3->second.get() not_eq 'N')
+                        if(nucleotide::isValidNucl(pos3->second.get(), false))
                         {
                             // pairwise substitution index
                             const auto mutPos = (nucleobase_count^2) * nucl1

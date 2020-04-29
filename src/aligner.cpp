@@ -256,7 +256,9 @@ void aligner::align_2()
             aligning_started = true;
             for (unsigned i = 0; i < num; ++i)
             {
-                const char base = to_upper(*read_seq_b);
+                const int quali = get_quality(*quality_seq_b);
+                const char base = quali < quality_treshold ? 'N' : to_upper(*read_seq_b);
+                //const char base = to_upper(*read_seq_b);
 //                if (base not_eq 'N')
 //                {
                     //maybe two from last_pos to end, and then from begin to las_pos

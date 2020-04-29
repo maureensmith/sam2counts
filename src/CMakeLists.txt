@@ -1,8 +1,5 @@
-# Note that headers are optional, and do not affect add_library, but they will not
-# show up in IDEs unless they are listed in add_library.
 
-# Optionally glob, but only for CMake 3.12 or later:
-# file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${ModernCMakeExample_SOURCE_DIR}/include/modern/*.hpp")
+
 set(HEADER_LIST
         aligner.hpp
         count.hpp
@@ -30,12 +27,8 @@ set(SOURCE_LIST
 # CMake instructions to make the static lib
 add_library(sam2counts STATIC ${SOURCE_LIST} ${HEADER_LIST})
 
-
-# All users of this library will need at least C++11
-#target_compile_features(modern_library PUBLIC cxx_std_11)
-
-# IDEs should put the headers in a nice place
-#source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
+#for g++-9 this is not necessary, but it is for g++-8
+target_link_libraries(sam2counts stdc++fs)
 
 
 

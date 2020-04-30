@@ -24,11 +24,16 @@ int get_quality(const char symbol)
 
 namespace aligner
 {
+    bool aligner::checkQuali() {
+        return quality_threshold > 0;
+    }
 
     bool aligner::prepare(std::string& line_a,
                           std::string& line_b)
     {
-        aligner::prepare(line_a);
+        if(!aligner::prepare(line_a)) {
+            return false;
+        }
 
         auto it = utils::find_tab_in_string<1>(line_b.begin());
         bool flag = utils::string_to_unsigned(it);
@@ -54,6 +59,11 @@ namespace aligner
         cigar_end_b = utils::find_tab_in_string<1>(cigar_it_b) - 1;
         read_seq_b = utils::find_tab_in_string<4>(cigar_end_b);
         quality_seq_b = utils::find_tab_in_string<1>(read_seq_b);
+
+        // if quality field does only contain a * , don't look for quality
+        if(*quality_seq_b == '*' && *(quality_seq_b + 1) == '\t') {
+            qualiCheck = false;
+        }
 
         return true;
     }
@@ -88,6 +98,11 @@ namespace aligner
         read_seq_a = utils::find_tab_in_string<4>(cigar_end_a);
         quality_seq_a = utils::find_tab_in_string<1>(read_seq_a);
 
+        // if quality field does only contain a * , don't look for quality
+        if(*quality_seq_a == '*' && *(quality_seq_a + 1) == '\t') {
+            qualiCheck = false;
+        }
+
         return true;
     }
 
@@ -106,10 +121,12 @@ void aligner::align()
         {
             read.reserve(read.size() + num);
             aligning_started = true;
+
+
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_a);
-                const char base = (*quality_seq_a != '*' &&  quali < quality_threshold) ? 'X' : to_upper(*read_seq_a);
+                const char base = (qualiCheck &&  quali < quality_threshold) ? 'X' : to_upper(*read_seq_a);
 
                 //TODO: erstmal rausnehmen, da wir für den Vergleich mit Red auch die rausschmeißen wo bei Überlappung utnerschiede sind
                 // und wenn N und irgendeine Mutation vorhanden ist, soll sie ja sowie rausgeschmissen werden
@@ -119,8 +136,7 @@ void aligner::align()
 //                }
                 ++posinref_a;
                 ++read_seq_a;
-                //if only "*" is given, no quality sequence is available
-                if(*quality_seq_a != '*')
+                if(qualiCheck)
                     ++quality_seq_a;
             }
 
@@ -132,15 +148,13 @@ void aligner::align()
         else if (c == 'I' )
         {
             read_seq_a += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_a != '*')
+            if(qualiCheck)
                 quality_seq_a += num;
         } 
         else if (c == 'S') 
         {
             read_seq_a += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_a != '*')
+            if(qualiCheck)
                 quality_seq_a += num;
             if (aligning_started)
             {
@@ -168,7 +182,7 @@ void aligner::align_1(count::counter_1& count_obj)
             for (unsigned i = 0; i < num; ++i)
             {
                 const int quali = get_quality(*quality_seq_b);
-                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
+                const char base = (qualiCheck && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
 
 
                //if (base_id not_eq 'N')
@@ -226,8 +240,7 @@ void aligner::align_1(count::counter_1& count_obj)
                 //}
                 ++posinref_b;
                 ++read_seq_b;
-                //if only "*" is given, no quality sequence is available
-                if(*quality_seq_b != '*')
+                if(qualiCheck)
                     ++quality_seq_b;
             }
 
@@ -239,15 +252,13 @@ void aligner::align_1(count::counter_1& count_obj)
         else if (c == 'I' )
         {
             read_seq_b += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_b != '*')
+            if(qualiCheck)
                 quality_seq_b += num;
         } 
         else if (c == 'S') 
         {
             read_seq_b += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_b != '*')
+            if(qualiCheck)
                 quality_seq_b += num;
             if (aligning_started)
             {
@@ -276,9 +287,8 @@ void aligner::align_2()
             aligning_started = true;
             for (unsigned i = 0; i < num; ++i)
             {
-
                 const int quali = get_quality(*quality_seq_b);
-                const char base = (*quality_seq_b != '*' && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
+                const char base = (qualiCheck && quali < quality_threshold) ? 'X' : to_upper(*read_seq_b);
 //                if (base_id not_eq 'N')
 //                {
                     //maybe two from last_pos to end, and then from begin to las_pos
@@ -334,8 +344,7 @@ void aligner::align_2()
 //                }
                 ++posinref_b;
                 ++read_seq_b;
-                //if only "*" is given, no quality sequence is available
-                if(*quality_seq_b != '*')
+                if(qualiCheck)
                     ++quality_seq_b;
             }
 
@@ -347,15 +356,13 @@ void aligner::align_2()
         else if (c == 'I' )
         {
             read_seq_b += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_b != '*')
+            if(qualiCheck)
                 ++quality_seq_b;
         } 
         else if (c == 'S') 
         {
             read_seq_b += num;
-            //if only "*" is given, no quality sequence is available
-            if(*quality_seq_b != '*')
+            if(qualiCheck)
                 ++quality_seq_b;
             if (aligning_started)
             {

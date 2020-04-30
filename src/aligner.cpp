@@ -311,6 +311,7 @@ void aligner::align_2()
 //                }
                 ++posinref_b;
                 ++read_seq_b;
+                ++quality_seq_b;
             }
 
         }
@@ -321,10 +322,12 @@ void aligner::align_2()
         else if (c == 'I' )
         {
             read_seq_b += num;
+            quality_seq_b += num;
         } 
         else if (c == 'S') 
         {
             read_seq_b += num;
+            quality_seq_b += num;
             if (aligning_started)
             {
                 posinref_b += num;

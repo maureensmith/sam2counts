@@ -64,26 +64,17 @@ class counter_2 final
     ~counter_2() = default;
 
     counter_2(const ref::reference& ref)
-    : size{ref.size()},  data(((size * size) - size) / 2, {0})
+    : refSize{ref.size()}, data(((refSize * refSize) - refSize) / 2, {0})
     {
     }
 
     void count(const ref::ref_map& read);
     void count(const ref::ref_map& read, const unsigned times);
-    void count(const std::size_t pos1, const std::size_t pos2,const char base1, const char base2, const int times)
-    {
-        const auto pos1_idx = (pos1 - 1);
-        const auto i = pos1_idx * (size-1) - utils::choose(pos1_idx, 2);
-        std::size_t pairwise_pos_index = i + pos2 - pos1_idx - 2;
-        std::size_t pairwise_nucl_index = nucleobase_count * nucleotide::nucleobase{base1}.to_id() + nucleotide::nucleobase{base2}.to_id();
-        data[pairwise_pos_index][pairwise_nucl_index] += times;
-    }
-
     void write_to_file(const std::string& out_file);
 
   private:
     static constexpr unsigned nucleobase_count{nucleotide::numberOfBasicSymbols};
-    const std::size_t size;
+    const std::size_t refSize;
     std::vector<std::array<count_type, nucleobase_count * nucleobase_count>> data;
 };
 
@@ -96,7 +87,7 @@ class counter_3 final
     ~counter_3() = default;
 
     counter_3(const ref::reference& ref)
-        : size{ref.size()},  data(utils::choose(size,3), {0})
+        : refSize{ref.size()}, data(utils::choose(refSize, 3), {0})
     {
     }
 
@@ -107,7 +98,7 @@ class counter_3 final
     void write_to_file(const std::string& out_file);
 
   private:
-    const std::size_t size;
+    const std::size_t refSize;
     static constexpr unsigned nucleobase_count{nucleotide::numberOfBasicSymbols};
     std::vector<std::array<count_type, nucleobase_count * nucleobase_count * nucleobase_count>> data;
 };

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 namespace count
 {
@@ -61,8 +62,9 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
     }
 
     auto pos1 = read.begin();
+    //the last element
     const auto end = std::prev(read.end());
-    const auto size_x = size - 1;
+    const auto size_x = refSize - 1;
     while (pos1 != end)
     {
         const auto pos1_idx = (pos1->first - 1);
@@ -120,7 +122,7 @@ void counter_2::write_to_file(const std::string& out_file)
             outfile << '\n';
 
             ++line;
-            if (j == size)
+            if (j == refSize)
             {
                 ++i;
                 j = i + 1;
@@ -146,7 +148,9 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
     }
 
     auto pos1 = read.begin();
+    //the second last element
     const auto end1 = std::prev(read.end(),2);
+    const auto refSize_x = refSize - 1;
     while (pos1 != end1)
     {
         //const auto pos1_idx = (pos1->first - 1);
@@ -156,7 +160,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
             auto p1 = pos1->first;
             auto nucl1 = pos1->second.to_id();
             //index start of the triplet, 1,2,3 is 1, 1,2,4 is 2, ...
-            const auto seqpos1 = utils::choose(size,3) - utils::choose(size-p1+1, 3);
+            const auto seqpos1 = utils::choose(refSize, 3) - utils::choose(refSize - p1 + 1, 3);
             const auto end2 = std::prev(read.end());
             auto pos2 = ++pos1;
             while (pos2 != end2)
@@ -166,14 +170,14 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                     auto p2 = pos2->first;
                     auto nucl2 = pos2->second.to_id();
                     // indexstart of position 2
-                    auto seqpos2 = (p2-p1-1)*(size-p1) - utils::choose(p2-p1,2);
+                    auto seqpos2 = (p2-p1-1)*(refSize - p1) - utils::choose(p2 - p1, 2);
                     auto pos3 = ++pos2;
                     while(pos3 != read.end())
                     {
                         if(nucleotide::isValidNucl(pos3->second.get(), false))
                         {
-                            // pairwise substitution index
-                            const auto mutPos = (nucleobase_count^2) * nucl1
+                            // triplet substitution index
+                            const auto mutPos = std::pow(nucleobase_count, 2) * nucl1
                                     + nucleobase_count * nucl2
                                     + pos3->second.to_id();
                              data[seqpos1 + seqpos2 + pos3->first - p2 - 1][mutPos] += times;
@@ -200,9 +204,9 @@ void counter_3::write_to_file(const std::string& out_file)
     unsigned k = 3;
     std::cout << "\nWriting counts to " << out_file << std::endl;
     const std::string header = "pos1\tpos2\tpos3\tAAA\tAAC\tAAG\tAAT\tACA\tACC\tACG\tACT\tAGA\tAGC\tAGG\tAGT\tATA\tATC\tATG\tATT"
-           "\tCAA\tCAC\tCAG\tCAT\tCCA\tCCC\tCCG\tCCT\tAGA\tCGC\tCGG\tCGT\tCTA\tCTC\tCTG\tCTT"
-            "\tGAA\tGAC\tGAG\tGAT\tGCA\tGCC\tGCG\tGCT\tAGA\tGGC\tGGG\tGGT\tGTA\tGTC\tGTG\tGTT"
-            "\tTAA\tTAC\tTAG\tTAT\tTCA\tTCC\tTCG\tTCT\tAGA\tTGC\tTGG\tTGT\tTTA\tTTC\tTTG\tTTT\n";
+           "\tCAA\tCAC\tCAG\tCAT\tCCA\tCCC\tCCG\tCCT\tCTA\tCGC\tCGG\tCGT\tCTA\tCTC\tCTG\tCTT"
+            "\tGAA\tGAC\tGAG\tGAT\tGCA\tGCC\tGCG\tGCT\tGGA\tGGC\tGGG\tGGT\tGTA\tGTC\tGTG\tGTT"
+            "\tTAA\tTAC\tTAG\tTAT\tTCA\tTCC\tTCG\tTCT\tTGA\tTGC\tTGG\tTGT\tTTA\tTTC\tTTG\tTTT\n";
 
 
 
@@ -232,9 +236,9 @@ void counter_3::write_to_file(const std::string& out_file)
             outfile << '\n';
 
             ++line;
-            if(k == size)
+            if(k == refSize)
             {
-                if(j==size-1){
+                if(j == refSize - 1){
                     ++i;
                     j = i + 1;
                 }

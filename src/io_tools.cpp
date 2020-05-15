@@ -2,10 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
-#include <sstream>
 #include <stdexcept>
-#include <utility>
-#include <iterator>
 #include <filesystem>
 #include <iostream>
 
@@ -38,7 +35,10 @@ namespace io_tools {
 
                 std::for_each(line.cbegin(), line.cend(), [&ref](char c) {
                     c = static_cast<char> (std::toupper(c));
-                    ref.add(nucleotide::nucleobase{c});
+                    //fasta may contain breakline which is ignored on Macs but interpreted on linux. Only read valid
+                    //nucleotide, as we expect this from a reference sequence
+                    if(nucleotide::isValidNucl(c, false))
+                        ref.add(nucleotide::nucleobase{c});
                 });
             }
         } else {

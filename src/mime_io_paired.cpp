@@ -35,10 +35,11 @@ void workflow_1(const ref::reference& reference,
     unsigned align_b = 0;
     unsigned count = 0;
 
+    unsigned readCount = 1;
+
     while (input_a.good() and input_b.good())
     {
         read.clear();
-        //missing check whether the lines belong together
         auto now = std::chrono::high_resolution_clock::now();
         const auto is_prepared = aligner.prepare(line_a, line_b);
         auto diff  = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - now);
@@ -63,6 +64,11 @@ void workflow_1(const ref::reference& reference,
             diff  = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - now);
             count += diff.count();
         }
+
+        // status of processed reads
+        ++readCount;
+        if(readCount%100000 == 0)
+            std::cout << readCount << " processed reads " << std::endl;
 
         std::getline(input_a, line_a);
         std::getline(input_b, line_b);
@@ -93,13 +99,13 @@ void workflow_2(const ref::reference& reference,
     // save times/duration for the alignments
     unsigned align_a = 0;
     unsigned align_b = 0;
-
     unsigned count = 0;
+
+    unsigned readCount = 1;
 
     while (input_a.good() and input_b.good())
     {
         read.clear();
-        //missing check whether the lines belong together
         if (aligner.prepare(line_a, line_b))
         {
             auto now = std::chrono::high_resolution_clock::now();
@@ -123,6 +129,11 @@ void workflow_2(const ref::reference& reference,
             diff  = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - now);
             count += diff.count();
         }
+
+        // status of processed reads
+        ++readCount;
+        if(readCount%100000 == 0)
+            std::cout << readCount << " processed reads " << std::endl;
 
         std::getline(input_a, line_a);
         std::getline(input_b, line_b);
@@ -153,10 +164,11 @@ void workflow_3(const ref::reference& reference,
     unsigned align_b = 0;
     unsigned count = 0;
 
+    unsigned readCount = 1;
+
     while (input_a.good() and input_b.good())
     {
         read.clear();
-        //missing check whether the lines belong together
         if (aligner.prepare(line_a, line_b))
         {
             auto now = std::chrono::high_resolution_clock::now();
@@ -180,6 +192,11 @@ void workflow_3(const ref::reference& reference,
             diff  = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - now);
             count += diff.count();
         }
+
+        // status of processed reads
+        ++readCount;
+        if(readCount%100000 == 0)
+            std::cout << readCount << " processed reads " << std::endl;
 
         std::getline(input_a, line_a);
         std::getline(input_b, line_b);

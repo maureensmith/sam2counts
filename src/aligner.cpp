@@ -31,6 +31,12 @@ namespace aligner
     bool aligner::prepare(std::string& line_a,
                           std::string& line_b)
     {
+        //the read pairs in both files have to be in the same order. Check for equal qname
+        if(!utils::check_readpair_names(line_a.begin(), line_b.begin())) {
+            std::cerr << "Something is wrong with order of the paired reads." << std::endl;
+            return false;
+        }
+
         if(!aligner::prepare(line_a)) {
             return false;
         }
@@ -87,7 +93,7 @@ namespace aligner
             return false;
         }
 
-        // getcigar containg the sofclipped regions, indels and aligned regions (6th entry in SAM row)
+        // getcigar containg the softclipped regions, indels and aligned regions (6th entry in SAM row)
         cigar_it_a = utils::find_tab_in_string<2>(it);
         if (unmapped or *cigar_it_a == '*')
         {

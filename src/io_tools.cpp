@@ -37,7 +37,7 @@ namespace io_tools {
                     c = static_cast<char> (std::toupper(c));
                     //fasta may contain breakline which is ignored on Macs but interpreted on linux. Only read valid
                     //nucleotide, as we expect this from a reference sequence
-                    if(nucleotide::isValidNucl(c, false))
+                    if(nucleotide::isValidNucl(c, false, false))
                         ref.add(nucleotide::nucleobase{c});
                 });
             }

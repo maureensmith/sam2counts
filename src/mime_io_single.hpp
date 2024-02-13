@@ -14,6 +14,8 @@ namespace mime_io_single {
                                   const std::string& out_file,
                                   const int dimension,
                                   const int qualityThreshold,
+                                //   bool checkInsertions,
+                                  bool checkDeletions,
                                   bool ambig);
 }
 

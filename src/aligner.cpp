@@ -149,7 +149,18 @@ void aligner::align()
         }
         else if (c == 'D')
         {
-            posinref_a += num;
+            if(countDeletions) 
+            {
+                const char base ='_';
+                for (unsigned i = 0; i < num; ++i) 
+                {
+                    read.add({posinref_a, nucleotide::nucleobase{base}});
+                    ++posinref_a;
+                }            
+            } else 
+            {
+                posinref_a += num;
+            }
         } 
         else if (c == 'I' )
         {
@@ -217,7 +228,7 @@ void aligner::align_1(count::counter_1& count_obj)
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
                         //if(base not_eq 'N')
-                        if(nucleotide::isValidNucl(base, ambig))
+                        if(nucleotide::isValidNucl(base, ambig, countDeletions))
                         {
                             count_obj.count(posinref_b - 1,
                                             base);
@@ -228,8 +239,8 @@ void aligner::align_1(count::counter_1& count_obj)
                         //overlapping: if the bases are equal-> ignore (will be counted later,
                         //as already stored in the read)
                         //if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
-                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig)
-                        or !nucleotide::isValidNucl(pos->second.get(), ambig))
+                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig, countDeletions)
+                        or !nucleotide::isValidNucl(pos->second.get(), ambig, countDeletions))
                         {
                             //if not equal-> check if one of the bases is equal to ref and count ref
                             // if different mutations: ignore
@@ -253,7 +264,54 @@ void aligner::align_1(count::counter_1& count_obj)
         }
         else if (c == 'D')
         {
-            posinref_b += num;
+            if(countDeletions) 
+            {
+                const char base ='_';
+                for (unsigned i = 0; i < num; ++i) 
+                {
+                    // check if reads overlap
+                    pos = std::find_if(pos, read.end(), [this](const auto& val)
+                                       {
+                                       return val.first == this->posinref_b;
+                                       });
+                    // ...for the the case the second read is before the first one
+                    if (pos == read.end())
+                    {
+                        pos = std::find_if(read.begin(), pos, [this](const auto& val)
+                                           {
+                                           return val.first == this->posinref_b;
+                                           });
+                    }
+
+                   if (pos == read.end())
+                    { 
+
+                        //no overlapping (see detailed comment above)
+                        if(nucleotide::isValidNucl(base, ambig, countDeletions))
+                        {
+                            count_obj.count(posinref_b - 1,base);
+                        }
+                    } else
+                    {
+                        //overlapping
+                        if(pos->second.get() not_eq base
+                        or !nucleotide::isValidNucl(pos->second.get(), ambig, countDeletions))
+                        {
+                            const auto ref_base = ref.get(posinref_b - 1).get();
+                            if (ref_base == pos->second.get())
+                            {
+                                count_obj.count(posinref_b - 1, ref_base);
+                            }
+                            // remove to not count twice (as it's stored in the read)
+                            read.remove(pos);
+                        }
+                    }
+                    ++posinref_b;
+                }
+            } else 
+            {
+                posinref_b += num;
+            }
         } 
         else if (c == 'I' )
         {
@@ -320,7 +378,7 @@ void aligner::align_2()
                         //no overlapping: count all nucleotides for the second read
                         //(is not stored in the read for later counting)
                         //if(base not_eq 'N')
-                        if(nucleotide::isValidNucl(base, ambig))
+                        if(nucleotide::isValidNucl(base, ambig, countDeletions))
                         {
                             read.add({posinref_b, nucleotide::nucleobase{base}});
                         }
@@ -330,8 +388,8 @@ void aligner::align_2()
                         //overlapping: if the bases are equal-> ignore (will be counted later,
                         //as already stored in the read)
                         //if (pos->second.get() not_eq base or base=='N' or pos->second.get()=='N')
-                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig)
-                               or !nucleotide::isValidNucl(pos->second.get(), ambig))
+                        if(pos->second.get() not_eq base or !nucleotide::isValidNucl(base, ambig, countDeletions)
+                               or !nucleotide::isValidNucl(pos->second.get(), ambig, countDeletions))
                         {
                             //if not equal-> check if one of the bases is equal to ref and count ref
                             // if different mutations: ignore
@@ -357,7 +415,61 @@ void aligner::align_2()
         }
         else if (c == 'D')
         {
-            posinref_b += num;
+            if(countDeletions) 
+            {
+                read.reserve(read.size() + num);
+                auto pos = read.begin();
+                const char base ='_';
+
+                for (unsigned i = 0; i < num; ++i)
+                {
+
+                    // check if the paired reads overlap...
+                    // ...for the case the second read is behind the first one
+                    pos = std::find_if(pos, read.end(), [this](const auto& val)
+                                       {
+                                       return val.first == this->posinref_b;
+                                       });
+
+                    //...for the the case the second read is before the first one
+                    if (pos == read.end())
+                    {
+                        pos = std::find_if(read.begin(), pos, [this](const auto& val)
+                                           {
+                                           return val.first == this->posinref_b;
+                                           });
+                    }
+
+                    if (pos == read.end())
+                    {
+                        read.add({posinref_b, nucleotide::nucleobase{base}});
+                    }
+                    else
+                    {
+                        //overlapping:                         
+                        if(pos->second.get() not_eq base 
+                               or !nucleotide::isValidNucl(pos->second.get(), ambig, countDeletions))
+                        {
+                            //if not equal-> check if one of the bases is equal to ref and count ref
+                            // if different mutations: ignore
+                            const auto ref_base = ref.get(posinref_b - 1).get();
+                            if (ref_base == pos->second.get())
+                            {
+                                pos->second = ref.get(posinref_b - 1);
+                            }else
+                            {
+                                // if different mutations or mutation and N: remove from read
+                                read.remove(pos);
+                                pos = read.begin();
+                            }
+                        }
+                    }
+                    ++posinref_b;
+                }
+            } else 
+            {
+                posinref_b += num;
+            }
         } 
         else if (c == 'I' )
         {

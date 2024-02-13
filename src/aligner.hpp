@@ -16,15 +16,25 @@ class aligner final
 
     aligner(const ref::reference& ref,
             ref::ref_map& read,
-            const int qualityThreshold) noexcept
-        : ref{ref}, read{read}, quality_threshold{qualityThreshold}, qualiCheck{checkQuali()}
+            const int qualityThreshold,
+            // bool insertions,
+            bool deletions) noexcept
+        : ref{ref}, read{read}, quality_threshold{qualityThreshold}, 
+        qualiCheck{checkQuali()}, 
+        // countInsertions{insertions}, 
+        countDeletions{deletions}
     {
     }
 
     aligner(const ref::reference& ref,
             ref::ref_map& read,
-            const int qualityThreshold, const bool a) noexcept
-            : ref{ref}, read{read}, quality_threshold{qualityThreshold}, ambig{a}, qualiCheck{checkQuali()}
+            const int qualityThreshold, const bool a,
+            // bool insertions,
+            bool deletions) noexcept
+            : ref{ref}, read{read}, quality_threshold{qualityThreshold}, 
+            ambig{a}, qualiCheck{checkQuali()}, 
+            // countInsertions{insertions}, 
+            countDeletions{deletions}
     {
     }
 
@@ -63,6 +73,9 @@ class aligner final
 
     const bool ambig{false};
     bool qualiCheck{false};
+
+    const bool countDeletions{false};
+    // const bool countInsertions{false};
 
     bool checkQuali();
 };

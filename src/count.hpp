@@ -23,13 +23,13 @@ class counter_1 final
     ~counter_1() = default;
 
 
-    counter_1(const ref::reference& ref)
-    : nucleobase_count(nucleotide::numberOfValidSymbols(false)), data(ref.size(), std::vector<count_type>(nucleobase_count))
+    counter_1(const ref::reference& ref, bool del)
+    : nucleobase_count(nucleotide::numberOfValidSymbols(false, del)), countDels{del}, data(ref.size(), std::vector<count_type>(nucleobase_count))
     {
     }
 
-    counter_1(const ref::reference& ref, bool a)
-            : ambig{a}, nucleobase_count(nucleotide::numberOfValidSymbols(a)), data(ref.size(), std::vector<count_type>(nucleobase_count))
+    counter_1(const ref::reference& ref,bool del, bool a)
+            : ambig{a}, countDels{del}, nucleobase_count(nucleotide::numberOfValidSymbols(a, del)), data(ref.size(), std::vector<count_type>(nucleobase_count))
     {
     }
 
@@ -40,6 +40,9 @@ class counter_1 final
     void count(const std::size_t index,
                const char base)
     {
+      if(countDels && base == '_')
+        ++data[index][nucleotide::numberOfValidSymbols(ambig, countDels)-1];
+      else
         ++data[index][nucleotide::nucleobase{base}.to_id()];
     }
 
@@ -50,6 +53,7 @@ class counter_1 final
     //containing counts for all 4 nucleotides for each position of the reference (counted from 0, for input/output -1)
     //std::vector<std::array<count_type, nucleobase_count>> data;
     const bool ambig{false};
+    const bool countDels{false};
     const unsigned nucleobase_count;
     std::vector<std::vector<count_type>> data;
 };

@@ -15,6 +15,7 @@ void printUsage(const std::string& progName) {
     std::cout << "-o, -out <outfile>\t output file where there counts is written to" << std::endl;
     std::cout << "-d, -dimension <dimension> \t 1, 2 or 3,  to count single, double or triple nucleotide occurrences" << std::endl;
     std::cout << "-q, -quality <qualityThreshold>\t (optional) filtering quality of each nucleotide to reach the given threshold" << std::endl;
+    std::cout << "-del, -countDeletions \t (optional) count also deletions in the cigar string" << std::endl;
     std::cout << "-a, -ambig \t (optional) by default only the nucleotides are counted and any ambiguity is ignored. "
                  "If this flag ist set, also all ambiguity symbols according to the IUPAC notation are counted."
                  "For now, this option is only enabled for dimension 1 and for single read SAM." << std::endl;
@@ -36,6 +37,9 @@ int main(int argc,
     bool rFlag = false;
     bool dFlag = false;
     bool aFlag = false;
+
+    bool delFlag = false;
+    // bool insFlag = false;
 
 
     for (int i = 1; i < argc; ++i) {
@@ -90,9 +94,13 @@ int main(int argc,
                 std::cerr << argv[i] << " option requires one argument." << std::endl;
                 return 1;
             }
-        }else if(arg == "-a" || arg == "-ambig") {
+        } else if(arg == "-a" || arg == "-ambig") {
             aFlag = true;
-        }else if(arg == "-h" || arg == "-help") {
+        } else if(arg == "-del" || arg == "-countDeletions") {
+            delFlag = true;
+        // } else if(arg == "-ins" || arg == "-countInsertions") {
+        //     insFlag = true;
+        } else if(arg == "-h" || arg == "-help") {
             printUsage(argv[0]);
             return 0;
         }
@@ -136,15 +144,19 @@ int main(int argc,
                                                  sam_file_B,
                                                  out_file,
                                                  dimension,
-                                                 qualityThreshold);
+                                                 qualityThreshold,
+                                                //  insFlag,
+                                                 delFlag);
     }
-    // call for paired end reads
+    // call for single reads
     else{
         mime_io_single::analyse_positions(ref_file,
                                           sam_file_A,
                                           out_file,
                                           dimension,
                                           qualityThreshold,
+                                        //   insFlag,
+                                          delFlag,
                                           aFlag);
     }
     return 0;

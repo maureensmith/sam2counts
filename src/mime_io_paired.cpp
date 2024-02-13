@@ -19,15 +19,19 @@ void workflow_1(const ref::reference& reference,
                 std::ifstream& input_a,
                 std::ifstream& input_b,
                 const std::string& out_file,
-                const int qualityThreshold)
+                const int qualityThreshold,
+                // bool checkInsertions,
+                bool checkDeletions)
 {
     std::string line_a = io_tools::get_first_data_line(input_a);
     std::string line_b = io_tools::get_first_data_line(input_b);
 
-    count::counter_1 counter{reference};
+    count::counter_1 counter{reference, checkDeletions};
     ref::ref_map read;
 
-    aligner::aligner aligner{reference, read, qualityThreshold};
+    aligner::aligner aligner{reference, read, qualityThreshold, 
+    // checkInsertions, 
+    checkDeletions};
 
     // record to time for each step
     unsigned prep = 0;
@@ -86,7 +90,9 @@ void workflow_2(const ref::reference& reference,
                 std::ifstream& input_a,
                 std::ifstream& input_b,
                 const std::string& out_file,
-                const int qualityThreshold)
+                const int qualityThreshold
+                // bool checkInsertions, bool checkDeletions
+                )
 {
     std::string line_a = io_tools::get_first_data_line(input_a);
     std::string line_b = io_tools::get_first_data_line(input_b);
@@ -94,7 +100,10 @@ void workflow_2(const ref::reference& reference,
     count::counter_2 counter{reference};
     ref::ref_map read;
 
-    aligner::aligner aligner{reference, read, qualityThreshold};
+    aligner::aligner aligner{reference, read, qualityThreshold, 
+    // checkInsertions, checkDeletions
+    false //<- checkDeletions
+    };
 
     // save times/duration for the alignments
     unsigned align_a = 0;
@@ -150,7 +159,9 @@ void workflow_3(const ref::reference& reference,
                 std::ifstream& input_a,
                 std::ifstream& input_b,
                 const std::string& out_file,
-                const int qualityThreshold)
+                const int qualityThreshold
+                // bool checkInsertions,bool checkDeletions
+                )
 {
     std::string line_a = io_tools::get_first_data_line(input_a);
     std::string line_b = io_tools::get_first_data_line(input_b);
@@ -158,7 +169,10 @@ void workflow_3(const ref::reference& reference,
     count::counter_3 counter{reference};
     ref::ref_map read;
 
-    aligner::aligner aligner{reference, read, qualityThreshold};
+    aligner::aligner aligner{reference, read, qualityThreshold,
+    // checkInsertions, checkDeletions
+    false //<- checkDeletions
+    };
 
     unsigned align_a = 0;
     unsigned align_b = 0;
@@ -215,7 +229,9 @@ void analyse_positions(const std::string& ref,
                        const std::string& sam_b,
                        const std::string& out_file,
                        const int dimension,
-                       const int qualityThreshold)
+                       const int qualityThreshold,
+                    //    bool checkInsertions,
+                       bool checkDeletions)
 {
     const auto ref_map = io_tools::read_reference(ref);
 
@@ -226,13 +242,24 @@ void analyse_positions(const std::string& ref,
     switch (dimension)
     {
       case 1:
-        workflow_1(ref_map, input_a, input_b, out_file, qualityThreshold);
+        workflow_1(ref_map, input_a, input_b, out_file, 
+        qualityThreshold, 
+        // checkInsertions, 
+        checkDeletions);
         break;
       case 2:
-        workflow_2(ref_map, input_a, input_b, out_file, qualityThreshold);
+        workflow_2(ref_map, input_a, input_b, out_file, 
+        qualityThreshold
+        // checkInsertions, 
+        //checkDeletions
+        );
         break;
       case 3:
-        workflow_3(ref_map, input_a, input_b, out_file, qualityThreshold);
+        workflow_3(ref_map, input_a, input_b, out_file, 
+        qualityThreshold
+        // checkInsertions, 
+        //checkDeletions
+        );
         break;
       default:
         throw "";

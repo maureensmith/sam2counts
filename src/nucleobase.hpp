@@ -49,9 +49,9 @@ namespace nucleotide
         }
     };
 
-    bool isValidNucl(const char nucl, const bool ambig);
+    bool isValidNucl(const char nucl, const bool ambig, const bool del);
 
-    unsigned numberOfValidSymbols(const bool ambig);
+    unsigned numberOfValidSymbols(const bool ambig, const bool del);
 }
 
 #endif

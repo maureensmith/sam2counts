@@ -20,13 +20,17 @@ namespace mime_io_single {
                         std::ifstream &input,
                         const std::string &out_file,
                         const int qualityThreshold,
+                        // bool checkInsertions,
+                        bool checkDeletions,
                         const bool ambig) {
             std::string line = io_tools::get_first_data_line(input);
 
-            count::counter_1 counter{reference, ambig};
+            count::counter_1 counter{reference, checkDeletions, ambig};
             ref::ref_map read;
 
-            aligner::aligner aligner{reference, read, qualityThreshold, ambig};
+            aligner::aligner aligner{reference, read, qualityThreshold, 
+            // checkInsertions, 
+            checkDeletions, ambig};
 
             // record to time for each step
             unsigned prep = 0;
@@ -66,13 +70,18 @@ namespace mime_io_single {
         void workflow_2(const ref::reference &reference,
                         std::ifstream &input,
                         const std::string &out_file,
-                        const int qualityThreshold) {
+                        const int qualityThreshold
+                        // bool checkInsertions,bool checkDeletions
+                        ) {
             std::string line = io_tools::get_first_data_line(input);
 
             count::counter_2 counter{reference};
             ref::ref_map read;
 
-            aligner::aligner aligner{reference, read, qualityThreshold};
+            aligner::aligner aligner{reference, read, qualityThreshold, 
+            // checkInsertions, checkDeletions
+            false //<-checkDeletions
+            };
 
             // record to time for each step
             unsigned prep = 0;
@@ -113,13 +122,18 @@ namespace mime_io_single {
     void workflow_3(const ref::reference &reference,
                     std::ifstream &input,
                     const std::string &out_file,
-                    const int qualityThreshold) {
+                    const int qualityThreshold
+                    // bool checkInsertions,bool checkDeletions
+                    ) {
         std::string line = io_tools::get_first_data_line(input);
 
         count::counter_3 counter{reference};
         ref::ref_map read;
 
-        aligner::aligner aligner{reference, read, qualityThreshold};
+        aligner::aligner aligner{reference, read, qualityThreshold, 
+        // checkInsertions, checkDeletions
+        false //<-checkDeletions
+        };
 
         // record to time for each step
         unsigned prep = 0;
@@ -161,6 +175,8 @@ namespace mime_io_single {
                                   const std::string& out_file,
                                   const int dimension,
                                   const int qualityThreshold,
+                                //   bool checkInsertions,
+                                  bool checkDeletions,
                                   bool ambig) {
 
         std::ifstream input(sam_a);
@@ -222,13 +238,19 @@ namespace mime_io_single {
         switch (dimension)
         {
             case 1:
-                workflow_1(ref_map, input, out_file, qualityThreshold, ambig);
+                workflow_1(ref_map, input, out_file, qualityThreshold, 
+                // checkInsertions, 
+                checkDeletions, ambig);
                 break;
             case 2:
-                workflow_2(ref_map,input, out_file, qualityThreshold);
+                workflow_2(ref_map,input, out_file, qualityThreshold
+                // checkInsertions, checkDeletions
+                );
                 break;
             case 3:
-                workflow_3(ref_map,input, out_file, qualityThreshold);
+                workflow_3(ref_map,input, out_file, qualityThreshold
+                // checkInsertions, checkDeletions
+                );
                 break;
             default:
                 throw "";

@@ -16,10 +16,12 @@ namespace count
     {
         std::for_each(read.begin(), read.end(), [this, times](const auto& entry)
         {
-            //if(entry.second.get() not_eq 'N')
-            if(nucleotide::isValidNucl(entry.second.get(), this->ambig))
+            //Workaround for deletion to make valid with and without ambig.
+            if(nucleotide::isValidNucl(entry.second.get(), this->ambig,false))
             {
                 data[entry.first - 1][entry.second.to_id()] += times;
+            } else if(this->countDels && entry.second.get() == '_') {
+                data[entry.first - 1][nucleotide::numberOfValidSymbols(this->ambig, this->countDels)-1] += times;
             }
         });
     }
@@ -34,8 +36,11 @@ void counter_1::write_to_file(const std::string& out_file)
     {
         //iterate header through valid symbols (also for ambiguous)
         outfile << "pos1";
-        for(int i = 0; i<nucleotide::numberOfValidSymbols(ambig); ++i) {
+        for(int i = 0; i<nucleotide::numberOfValidSymbols(ambig, false); ++i) {
             outfile << "\t" << nucleotide::nucleobase{i}.get();
+        }
+        if(countDels) {
+            outfile << "\t" << "_";
         }
         outfile << "\n";
         for (unsigned i = 0; i < data.size(); ++i)
@@ -71,12 +76,12 @@ void counter_2::count(const ref::ref_map& read, const unsigned times)
         auto nucl1 = pos1->second;
         //pairwise position index start
         const auto i = pos1_idx * size_x - utils::choose(pos1_idx, 2);
-        if(nucleotide::isValidNucl(pos1->second.get(), false))
+        if(nucleotide::isValidNucl(pos1->second.get(), false, false))
         {
             auto pos2 = ++pos1;
             while (pos2 != read.end())
             {
-                if(nucleotide::isValidNucl(pos2->second.get(), false))
+                if(nucleotide::isValidNucl(pos2->second.get(), false, false))
                 {
                     const auto j = nucleobase_count * nucl1.to_id();
                     data[i + pos2->first - pos1_idx - 2][j + pos2->second.to_id()] += times;
@@ -101,8 +106,8 @@ void counter_2::write_to_file(const std::string& out_file)
     {
         //iterate header through valid symbols (also for ambiguous)
         outfile << "pos1\tpos2";
-        for(int i = 0; i<nucleotide::numberOfValidSymbols(false); ++i) {
-            for(int j = 0; j<nucleotide::numberOfValidSymbols(false); ++j) {
+        for(int i = 0; i<nucleotide::numberOfValidSymbols(false, false); ++i) {
+            for(int j = 0; j<nucleotide::numberOfValidSymbols(false, false); ++j) {
                 outfile << "\t" << nucleotide::nucleobase{i}.get() << nucleotide::nucleobase{j}.get();
             }
         }
@@ -155,7 +160,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
     {
         //const auto pos1_idx = (pos1->first - 1);
 
-        if(nucleotide::isValidNucl(pos1->second.get(), false))
+        if(nucleotide::isValidNucl(pos1->second.get(), false, false))
         {
             auto p1 = pos1->first;
             auto nucl1 = pos1->second.to_id();
@@ -165,7 +170,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
             auto pos2 = ++pos1;
             while (pos2 != end2)
             {
-                if(nucleotide::isValidNucl(pos2->second.get(), false))
+                if(nucleotide::isValidNucl(pos2->second.get(), false, false))
                 {
                     auto p2 = pos2->first;
                     auto nucl2 = pos2->second.to_id();
@@ -174,7 +179,7 @@ void counter_3::count(const ref::ref_map& read, const unsigned times)
                     auto pos3 = ++pos2;
                     while(pos3 != read.end())
                     {
-                        if(nucleotide::isValidNucl(pos3->second.get(), false))
+                        if(nucleotide::isValidNucl(pos3->second.get(), false, false))
                         {
                             // triplet substitution index
                             const auto mutPos = std::pow(nucleobase_count, 2) * nucl1

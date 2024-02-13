@@ -2,19 +2,20 @@
 
 #include <stdexcept>
 #include <utility>
+#include <iostream>
 
 
 namespace nucleotide
 {
 
 
-    const std::array<char, 17> nucleobase::bases{'A', 'C', 'G', 'T', 'N' ,'R', 'Y', 'K', 'M', 'S', 'W', 'B', 'D', 'H', 'V', 'Z', 'X'};
+    const std::array<char, 17> nucleobase::bases{'A', 'C', 'G', 'T', 'N' ,'R', 'Y', 'K', 'M', 'S', 'W', 'B', 'D', 'H', 'V', '_', 'X'};
 
     nucleobase::nucleobase(char base)
     {
 
         //mapping of the nucleotide bases to IDs (eg A-A/2 = 0, C-A/2 = 1 etc)
-        //A=0, C=1, G=2, T=3, N=4, X=5
+        //A=0, C=1, G=2, T=3, N=4, X=16
         switch(base)
         {
             case 'A': this->base_id = 0; break;
@@ -32,8 +33,9 @@ namespace nucleotide
             case 'D': this->base_id = 12; break;
             case 'H': this->base_id = 13; break;
             case 'V': this->base_id = 14; break;
+            case '_': this->base_id = 15; break;
             //Z=Zero, X does not exist
-            default: this->base_id = 15; break;
+            default: this->base_id = 16; break;
         }
     }
     nucleobase::nucleobase(const int id)
@@ -57,18 +59,25 @@ namespace nucleotide
 //        base_id = base_id_from1 - 1;
 //    }
 
-    bool isValidNucl(const char nucl, const bool ambig) {
-        if(ambig)
+    bool isValidNucl(const char nucl, const bool ambig, const bool del) {
+        if(del && (nucl == '_')) {
+            return true;
+        }
+        else if(ambig)
             return nucleobase{nucl}.to_id() < numberOfAmbigSymbols;
         else
             return nucleobase{nucl}.to_id() < numberOfBasicSymbols;
     }
 
-     unsigned numberOfValidSymbols(const bool ambig) {
+     unsigned numberOfValidSymbols(const bool ambig, const bool del) {
+        unsigned bases = 0;
+        if(del)
+            bases = 1;
+
         if(ambig)
-            return numberOfAmbigSymbols;
+            return bases + numberOfAmbigSymbols;
         else
-            return numberOfBasicSymbols;
+            return bases + numberOfBasicSymbols;
     }
 
 }

@@ -10,7 +10,9 @@ namespace mime_io_paired
                                   const std::string& sam_b,
                                   const std::string& out_file,
                                   const int dimension,
-                                  const int qualityThreshold);
+                                  const int qualityThreshold,
+                                //   bool checkInsertions,
+                                  bool checkDeletions);
 
 }
 
